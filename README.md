@@ -6,3 +6,8 @@ Customization and Club Integration:
 The platform could be extended to serve as a comprehensive hub for the club, including features such as trophies, photos, and other multimedia to celebrate achievements and foster community engagement.
 
 The system could draw inspiration from our Advent of Code leaderboard (e.g., Advent of Code Private Leaderboard), providing a user-friendly interface that is visually appealing and easy to navigate. This project offers an exciting opportunity to create a tool that not only promotes healthy competition but also enhances the club's visibility and engagement.
+
+
+### Team Members
+
+
