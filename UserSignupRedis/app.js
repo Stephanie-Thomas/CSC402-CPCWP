@@ -1,70 +1,70 @@
-const express = require("express");
+import express from 'express';
+import session from 'express-session';
+import Redis from 'ioredis';
+import RedisStore from 'connect-redis';
+
 const app = express();
-const uuidv4 = require("uuid").v4;
-const Redis = require("ioredis");
-
-const redis = new Redis(); // Connect to Redis on localhost:6379
-
 const port = 3000;
-app.use(express.json()); // Middleware to parse JSON request bodies
 
-// Login Endpoint - Authenticates user and creates a session
-app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
+// Initialize Redis client
+const redisClient = new Redis();
 
-    // Validate credentials (hardcoded for demonstration purposes)
-    if (username !== "admin" || password !== "admin") {
-        return res.status(401).send("Invalid Username or password");
-    }
+// Configure session middleware
+app.use(
+  session({
+    store: new RedisStore({
+      client: redisClient,  // Pass the Redis client instance
+      disableTouch: true,   // Disable automatic "touching" of sessions
+    }),
+    secret: 'super-secret-key',  // Secret key for signing session ID cookie
+    resave: false,               // Prevents unnecessary session saving
+    saveUninitialized: false,    // Avoid saving empty sessions
+    cookie: {
+      httpOnly: true,  // Prevents JavaScript access to cookies
+      secure: false,   // Set `true` in production (requires HTTPS)
+      maxAge: 10000, // Session expiration time in milliseconds (1 hour)
+    },
+  })
+);
 
-    // Generate a unique session ID
-    const sessionId = uuidv4();
-    const sessionData = JSON.stringify({ username, userId: 1 });
+// Middleware to parse JSON requests
+app.use(express.json());
 
-    // Store session in Redis with a 1-hour expiration time (3600 seconds)
-    await redis.setex(`session:${sessionId}`, 3600, sessionData);
+// Login - Creates a session and stores it in Redis
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
 
-    // Set session ID in an HTTP-only cookie for security
-    res.set("Set-Cookie", `session=${sessionId}; HttpOnly`);
-    res.send("Success");
+  if (username !== 'admin' || password !== 'admin') {
+    return res.status(401).send('Invalid Username or Password');
+  }
+
+  // Store user data in session
+  req.session.user = { username, userId: 1 };
+
+  res.send('Login Successful');
 });
 
-// Logout Endpoint - Deletes user session from Redis
-app.post('/logout', async (req, res) => {
-    // Extract session ID from cookies
-    const sessionId = req.headers.cookie?.split("=")[1];
-
-    if (sessionId) {
-        await redis.del(`session:${sessionId}`); // Remove session from Redis
+// Logout - Destroys the session in Redis
+app.post('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).send('Error logging out');
     }
-
-    // Clear cookie by setting it with Max-Age=0
-    res.set("Set-Cookie", "session=; HttpOnly; Max-Age=0");
-    res.send("Success");
+    res.clearCookie('connect.sid'); // Remove session cookie
+    res.send('Logout Successful');
+  });
 });
 
-// Home Endpoint - Validates session and returns user data
-app.get("/home", async (req, res) => {
-    // Extract session ID from cookies
-    const sessionId = req.headers.cookie?.split("=")[1];
+// Home - Checks if the session is valid
+app.get('/home', (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).send('Invalid session');
+  }
 
-    if (!sessionId) {
-        return res.status(401).send("Invalid session");
-    }
-
-    // Retrieve session data from Redis
-    const sessionData = await redis.get(`session:${sessionId}`);
-
-    if (!sessionData) {
-        return res.status(401).send("Invalid session");
-    }
-
-    // Parse session data and send response
-    const userSession = JSON.parse(sessionData);
-    res.send([{ userSession, sessionId }]);
+  res.send({ sessionData: req.session.user });
 });
 
 // Start the Express server
 app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+  console.log(`Server running on port ${port}`);
 });
