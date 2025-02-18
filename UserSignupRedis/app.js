@@ -1,4 +1,3 @@
-const http = require("http")
 const express = require("express")
 const app = express()
 const uuidv4 = require("uuid").v4
