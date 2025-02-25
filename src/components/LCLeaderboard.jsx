@@ -1,6 +1,12 @@
 // src/components/LeetcodeLeaderboard.js
 import React, { useEffect, useState } from 'react';
-import './Leaderboard.css';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 
 const LeetcodeLeaderboard = () => {
   const [leaderboard, setLeaderboard] = useState([]);
@@ -16,12 +22,10 @@ const LeetcodeLeaderboard = () => {
         return response.json();
       })
       .then((data) => {
-        console.log('Leetcode leaderboard data:', data);
         setLeaderboard(data);
         setLoading(false);
       })
       .catch((err) => {
-        console.error('Error fetching Leetcode leaderboard:', err);
         setError(err.message);
         setLoading(false);
       });
@@ -29,7 +33,7 @@ const LeetcodeLeaderboard = () => {
 
   if (loading) {
     return (
-      <div className="loading">
+      <div style={{ textAlign: 'center', padding: '20px' }}>
         <p>Loading Leetcode data...</p>
       </div>
     );
@@ -37,36 +41,66 @@ const LeetcodeLeaderboard = () => {
 
   if (error) {
     return (
-      <div className="error">
+      <div style={{ textAlign: 'center', padding: '20px', color: 'red' }}>
         <p>{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="leaderboard-container">
-      <h1 className="leaderboard-header">Leetcode Leaderboard</h1>
-      <div className="table-responsive">
-        <table className="leaderboard-table">
-          <thead>
-            <tr>
-              <th>Username</th>
-              <th>Total Solved</th>
-              <th>Ranking</th>
-            </tr>
-          </thead>
-          <tbody>
-            {leaderboard.map((user, index) => (
-              <tr key={index}>
-                <td>{user.username}</td>
-                <td>{user.totalSolved || 'N/A'}</td>
-                <td>{user.ranking || 'N/A'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <TableContainer
+      component={Paper}
+      sx={{
+        backgroundColor: 'background.paper',
+        boxShadow: 3,
+        borderRadius: 2,
+        maxWidth: 800,
+        margin: '20px auto',
+      }}
+    >
+      <Table sx={{ minWidth: 650 }} aria-label="Leetcode leaderboard table">
+        <TableHead sx={{ backgroundColor: 'grey.900' }}>
+          <TableRow>
+            <TableCell sx={{ color: 'text.primary', fontWeight: 'bold' }}>
+              Username
+            </TableCell>
+            <TableCell
+              align="right"
+              sx={{ color: 'text.primary', fontWeight: 'bold' }}
+            >
+              Total Solved
+            </TableCell>
+            <TableCell
+              align="right"
+              sx={{ color: 'text.primary', fontWeight: 'bold' }}
+            >
+              Ranking
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {leaderboard.map((user, index) => (
+            <TableRow
+              key={user.username || index}
+              sx={{
+                backgroundColor: 'background.default',
+                '&:hover': { backgroundColor: 'grey.800' },
+              }}
+            >
+              <TableCell component="th" scope="row" sx={{ color: 'text.primary' }}>
+                {user.username}
+              </TableCell>
+              <TableCell align="right" sx={{ color: 'text.primary' }}>
+                {user.totalSolved || 'N/A'}
+              </TableCell>
+              <TableCell align="right" sx={{ color: 'text.primary' }}>
+                {user.ranking || 'N/A'}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 };
 
