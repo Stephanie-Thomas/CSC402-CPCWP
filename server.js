@@ -93,14 +93,18 @@ app.get('/api/leetcode-leaderboard', async (req, res) => {
           };
         } catch (error) {
           console.error(`Error fetching data for ${username}:`, error);
+          // Return a default object; using 0 for totalSolved so sorting works correctly.
           return {
             username,
-            totalSolved: 'N/A',
+            totalSolved: 0,
             ranking: 'N/A'
           };
         }
       })
     );
+
+    // Sort the leaderboard by totalSolved in descending order
+    responses.sort((a, b) => b.totalSolved - a.totalSolved);
 
     await redisClient.setEx(cacheKey, 120, JSON.stringify(responses));
     console.log('Leetcode leaderboard data cached in Redis');
