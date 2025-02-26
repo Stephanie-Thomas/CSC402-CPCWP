@@ -23,8 +23,8 @@ redisClient.on('error', (err) => {
 })();
 
 // Existing Codeforces endpoint (unchanged)
-app.get('/api/leaderboard', async (req, res) => {
-  const cacheKey = 'leaderboard';
+app.get('/api/codeforces-leaderboard', async (req, res) => {
+  const cacheKey = 'Codeforcesleaderboard';
 
   try {
     const cachedLeaderboard = await redisClient.get(cacheKey);
@@ -64,7 +64,7 @@ app.get('/api/leaderboard', async (req, res) => {
   }
 });
 
-// New endpoint for Leetcode leaderboard using /userProfile/:username
+// Updated endpoint for Leetcode leaderboard that now includes contest ranking
 app.get('/api/leetcode-leaderboard', async (req, res) => {
   const cacheKey = 'leetcodeLeaderboard';
 
@@ -80,34 +80,57 @@ app.get('/api/leetcode-leaderboard', async (req, res) => {
 
   try {
     // Replace these with the actual Leetcode usernames you want to display
-    const users = ['hello', 'kmatotek', 'dude'];
+    const users = ['kmatotek','jetacop384','ainta98', 'uwi'];
     const responses = await Promise.all(
       users.map(async (username) => {
         try {
-          const response = await axios.get(`https://alfa-leetcode-api.onrender.com/userProfile/${username}`);
-          const data = response.data;
+          const [profileResponse, contestResponse] = await Promise.all([
+            axios.get(`https://alfa-leetcode-api.onrender.com/userProfile/${username}`),
+            axios.get(`https://alfa-leetcode-api.onrender.com/userContestRankingInfo/${username}`)
+          ]);
+          const profileData = profileResponse.data;
+          const contestData = contestResponse.data;
+          
+          // Extract the last contest ranking from the contest history if available.
+          let contestRanking = null;
+          let contestTitle = null;
+          const history = contestData.data?.userContestRankingHistory;
+          if (history && Array.isArray(history) && history.length > 0) {
+            const lastContest = history[history.length - 1];
+            contestRanking = lastContest.ranking || 'N/A';
+            contestTitle = lastContest.contest?.title || null;
+          }
+          
           return {
-            username,             // use the username from our list
-            totalSolved: data.totalSolved,
-            ranking: data.ranking
+            username,
+            totalSolved: profileData.totalSolved,
+            ranking: profileData.ranking,
+            contestRanking,
+            contestTitle,
           };
         } catch (error) {
           console.error(`Error fetching data for ${username}:`, error);
-          // Return a default object; using 0 for totalSolved so sorting works correctly.
           return {
             username,
             totalSolved: 0,
-            ranking: 'N/A'
+            ranking: 'N/A',
+            contestRanking: 'N/A',
+            contestTitle: null,
           };
         }
       })
     );
 
-    // Sort the leaderboard by totalSolved in descending order
-    responses.sort((a, b) => b.totalSolved - a.totalSolved);
+    // Sort the leaderboard by contest ranking (lower is better).
+    // If contestRanking is not numeric (or 'N/A'), treat it as Infinity so it sorts last.
+    responses.sort((a, b) => {
+      const rankA = typeof a.contestRanking === 'number' ? a.contestRanking : Infinity;
+      const rankB = typeof b.contestRanking === 'number' ? b.contestRanking : Infinity;
+      return rankA - rankB;
+    });
 
     await redisClient.setEx(cacheKey, 120, JSON.stringify(responses));
-    console.log('Leetcode leaderboard data cached in Redis');
+    console.log('Leetcode leaderboard data (with contest ranking) cached in Redis');
     res.json(responses);
   } catch (error) {
     console.error('Error fetching Leetcode leaderboard:', error);

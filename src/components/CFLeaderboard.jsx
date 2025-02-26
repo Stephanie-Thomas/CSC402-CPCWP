@@ -14,7 +14,7 @@ const CodeforcesLeaderboard = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:5001/api/leaderboard')
+    fetch('http://localhost:5001/api/codeforces-leaderboard')
       .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to fetch Codeforces leaderboard data');
