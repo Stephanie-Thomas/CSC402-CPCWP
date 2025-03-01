@@ -1,0 +1,27 @@
+{
+  "name": "hostingtest",
+  "version": "1.0.0",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"  
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tobibussiek/HostingTest.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tobibussiek/HostingTest/issues"
+  },
+  "homepage": "https://github.com/tobibussiek/HostingTest#readme",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "node-fetch": "^3.3.2"
+  }
+}

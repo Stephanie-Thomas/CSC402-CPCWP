@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codeforces Leaderboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        input {
+            padding: 10px;
+            margin-bottom: 10px;
+            width: 250px;
+        }
+        button {
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        #result {
+            margin-top: 20px;
+            text-align: left;
+            max-width: 500px;
+            margin: auto;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 10px;
+            display: none; /* Hidden initially */
+            background-color: #f9f9f9;
+        }
+        #loading {
+            display: none;
+            font-size: 18px;
+            color: #888;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        img {
+            border-radius: 50%;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Codeforces Leaderboard</h2>
+    <p>Enter a Codeforces username:</p>
+    <input type="text" id="username" placeholder="Enter username">
+    <button onclick="fetchCodeforcesData()">Get Data</button>
+
+    <p id="loading">Fetching data...</p>
+
+    <div id="result"></div>
+
+    <script>
+        async function fetchCodeforcesData() {
+            let username = document.getElementById("username").value.trim();
+            if (!username) {
+                alert("Please enter a username!");
+                return;
+            }
+
+            let apiUrl = `https://hostingtest-404q.onrender.com/api/codeforces/${username}`;
+            let loadingText = document.getElementById("loading");
+            let resultDiv = document.getElementById("result");
+
+            // Show loading text and hide previous result
+            loadingText.style.display = "block";
+            resultDiv.style.display = "none";
+            resultDiv.innerHTML = "";
+
+            try {
+                let response = await fetch(apiUrl);
+                let data = await response.json();
+                
+                if (data.error || data.status !== "OK") {
+                    resultDiv.innerHTML = `<p style="color: red;">User not found or API error.</p>`;
+                } else {
+                    let user = data.result[0];
+
+                    resultDiv.innerHTML = `
+                        <h3>${user.handle} (${user.rank.replace("-", " ").toUpperCase()})</h3>
+                        <img src="${user.avatar}" width="100" height="100" alt="Avatar">
+                        <table>
+                            <tr><th>Rank</th><td>${user.rank}</td></tr>
+                            <tr><th>Rating</th><td>${user.rating}</td></tr>
+                            <tr><th>Max Rank</th><td>${user.maxRank}</td></tr>
+                            <tr><th>Max Rating</th><td>${user.maxRating}</td></tr>
+                            <tr><th>Country</th><td>${user.country || "N/A"}</td></tr>
+                            <tr><th>Organization</th><td>${user.organization || "N/A"}</td></tr>
+                        </table>
+                    `;
+                    resultDiv.style.display = "block";
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">Error retrieving data. Check console.</p>`;
+                console.error("Error fetching data:", error);
+            }
+
+            // Hide loading text
+            loadingText.style.display = "none";
+        }
+    </script>
+
+</body>
+</html>
