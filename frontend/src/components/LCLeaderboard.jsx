@@ -1,4 +1,3 @@
-// frontend/src/components/LCLeaderboard.jsx
 import React, { useEffect, useState } from 'react';
 
 const LCLeaderboard = () => {

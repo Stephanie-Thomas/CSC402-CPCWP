@@ -63,8 +63,8 @@ router.get('/codeforces-leaderboard', async (req, res) => {
         maxRank: user.maxRank,
       };
     });
-
-    await redisClient.setEx(cacheKey, 120, JSON.stringify(leaderboard));
+    // Set time to 300 sec to last in redis
+    await redisClient.setEx(cacheKey, 300, JSON.stringify(leaderboard));
     console.log('Codeforces leaderboard data cached in Redis');
     res.json(leaderboard);
   } catch (error) {
@@ -134,7 +134,7 @@ router.get('/leetcode-leaderboard', async (req, res) => {
       return rankA - rankB;
     });
 
-    await redisClient.setEx(cacheKey, 120, JSON.stringify(responses));
+    await redisClient.setEx(cacheKey, 300, JSON.stringify(responses));
     console.log('Leetcode leaderboard data (with contest ranking) cached in Redis');
     res.json(responses);
   } catch (error) {

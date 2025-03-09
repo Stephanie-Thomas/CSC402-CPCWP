@@ -1,12 +1,12 @@
 import React from 'react';
-import LCLeaderboard from './components/LCLeaderboard';
+import LeaderboardToggle from './components/LeaderboardToggle';
 
 
 const App = () => {
   return (
     <div>
       <h1>LeetCode Stats Viewer</h1>
-      <LCLeaderboard/>
+      <LeaderboardToggle/>
     </div>
   );
 };
