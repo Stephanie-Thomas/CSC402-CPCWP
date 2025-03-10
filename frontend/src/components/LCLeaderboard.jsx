@@ -19,7 +19,8 @@ const LCLeaderboard = () => {
       })
       .then((data) => {
         if (viewMode === 'contest') {
-          const valid = data.find((user) => user.contestTitle);
+          // Find a user with a valid contest title and a contest ranking not equal to "0"
+          const valid = data.find((user) => user.contestTitle && user.contestRanking !== "0");
           setContestTitle(valid ? valid.contestTitle : 'Contest Rankings');
         } else {
           setContestTitle('');
@@ -38,9 +39,90 @@ const LCLeaderboard = () => {
     setViewMode(newMode);
   };
 
+  // For contest view, sort leaderboard so that rankings of "0" (treated as "N/A") and "N/A" come last.
+  const sortedLeaderboard = viewMode === 'contest'
+    ? [...leaderboard].sort((a, b) => {
+        const parseRank = (rank) => {
+          if (rank === "0" || rank === "N/A") {
+            return Infinity;
+          }
+          return parseInt(rank, 10);
+        };
+        return parseRank(a.contestRanking) - parseRank(b.contestRanking);
+      })
+    : leaderboard;
+
+  const containerStyle = {
+    maxWidth: '900px',
+    margin: '2rem auto',
+    backgroundColor: '#1a1a1a',
+    borderRadius: '8px',
+    padding: '20px',
+  };
+
+  const buttonContainerStyle = {
+    display: 'flex',
+    gap: '10px',
+    justifyContent: 'center',
+    marginBottom: '20px',
+  };
+
+  const buttonStyle = {
+    padding: '8px 20px',
+    border: 'none',
+    borderRadius: '4px',
+    backgroundColor: '#212121',
+    color: '#ffffff',
+    fontSize: '14px',
+    cursor: 'pointer',
+    transition: 'background-color 0.2s ease',
+  };
+
+  const activeButtonStyle = {
+    ...buttonStyle,
+    backgroundColor: '#4285f4',
+  };
+
+  const tableContainerStyle = {
+    backgroundColor: '#1a1a1a',
+    borderRadius: '8px',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+    overflowX: 'auto',
+  };
+
+  const tableStyle = {
+    width: '100%',
+    borderCollapse: 'collapse',
+  };
+
+  const headerStyle = {
+    backgroundColor: '#212121',
+    color: '#ffffff',
+  };
+
+  const headerCellStyle = {
+    padding: '14px 16px',
+    fontWeight: '600',
+    fontSize: '14px',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+  };
+
+  const rowStyle = {
+    backgroundColor: '#2d2d2d',
+    borderBottom: '1px solid #444',
+    transition: 'background-color 0.2s ease',
+  };
+
+  const cellStyle = {
+    padding: '14px 16px',
+    color: '#e0e0e0',
+    fontSize: '14px',
+  };
+
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '16px' }}>
+      <div style={{ textAlign: 'center', padding: '20px', color: '#ffffff' }}>
         <p>Loading LeetCode data...</p>
       </div>
     );
@@ -48,105 +130,72 @@ const LCLeaderboard = () => {
 
   if (error) {
     return (
-      <div style={{ textAlign: 'center', padding: '16px', color: '#d32f2f' }}>
+      <div style={{ textAlign: 'center', padding: '20px', color: '#ff4444' }}>
         <p>{error}</p>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: '900px', margin: '2rem auto 0' }}>
-      <div style={{ marginBottom: '16px', display: 'flex', gap: '8px' }}>
+    <div style={containerStyle}>
+      <div style={buttonContainerStyle}>
         <button
           onClick={() => handleViewModeChange('profile')}
-          style={{
-            padding: '8px 16px',
-            border: '1px solid #555',
-            backgroundColor: viewMode === 'profile' ? '#555' : 'transparent',
-            color: '#fff',
-            cursor: 'pointer',
-            borderRadius: '4px'
-          }}
+          style={viewMode === 'profile' ? activeButtonStyle : buttonStyle}
         >
           Profile
         </button>
         <button
           onClick={() => handleViewModeChange('contest')}
-          style={{
-            padding: '8px 16px',
-            border: '1px solid #555',
-            backgroundColor: viewMode === 'contest' ? '#555' : 'transparent',
-            color: '#fff',
-            cursor: 'pointer',
-            borderRadius: '4px'
-          }}
+          style={viewMode === 'contest' ? activeButtonStyle : buttonStyle}
         >
           Contest
         </button>
       </div>
 
       {viewMode === 'contest' && contestTitle && (
-        <h6 style={{ textAlign: 'center', marginBottom: '16px', color: '#fff' }}>
+        <h6 style={{ textAlign: 'center', marginBottom: '20px', color: '#ffffff', fontSize: '16px' }}>
           {contestTitle}
         </h6>
       )}
 
-      <div style={{
-        backgroundColor: '#1a1a1a',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
-        borderRadius: '8px',
-        marginBottom: '32px',
-        overflowX: 'auto'
-      }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead style={{ backgroundColor: '#212121' }}>
+      <div style={tableContainerStyle}>
+        <table style={tableStyle}>
+          <thead style={headerStyle}>
             <tr>
-              <th style={{ padding: '12px', textAlign: 'left', color: '#fff', fontWeight: 'bold' }}>
-                Username
-              </th>
+              <th style={{ ...headerCellStyle, textAlign: 'left' }}>Username</th>
               {viewMode === 'profile' ? (
                 <>
-                  <th style={{ padding: '12px', textAlign: 'right', color: '#fff', fontWeight: 'bold' }}>
-                    Total Solved
-                  </th>
-                  <th style={{ padding: '12px', textAlign: 'right', color: '#fff', fontWeight: 'bold' }}>
-                    Ranking
-                  </th>
+                  <th style={{ ...headerCellStyle, textAlign: 'right' }}>Total Solved</th>
+                  <th style={{ ...headerCellStyle, textAlign: 'right' }}>Ranking</th>
                 </>
               ) : (
-                <th style={{ padding: '12px', textAlign: 'right', color: '#fff', fontWeight: 'bold' }}>
-                  Contest Ranking
-                </th>
+                <th style={{ ...headerCellStyle, textAlign: 'right' }}>Contest Ranking</th>
               )}
             </tr>
           </thead>
           <tbody>
-            {leaderboard.map((user, index) => (
+            {sortedLeaderboard.map((user, index) => (
               <tr
                 key={user.username || index}
-                style={{
-                  backgroundColor: '#2d2d2d',
-                  borderBottom: '1px solid #444',
-                  '&:hover': { backgroundColor: '#333' }
-                }}
+                className="leaderboard-row"
+                style={rowStyle}
               >
-                <td style={{ padding: '12px', color: '#fff' }}>{user.username}</td>
+                <td style={{ ...cellStyle, textAlign: 'left', fontWeight: '500' }}>{user.username}</td>
                 {viewMode === 'profile' ? (
                   <>
-                    <td style={{ padding: '12px', textAlign: 'right', color: '#fff' }}>
+                    <td style={{ ...cellStyle, textAlign: 'right' }}>
                       {user.totalSolved || 'N/A'}
                     </td>
-                    <td style={{ padding: '12px', textAlign: 'right', color: '#fff' }}>
+                    <td style={{ ...cellStyle, textAlign: 'right' }}>
                       {user.ranking || 'N/A'}
                     </td>
                   </>
                 ) : (
-                  <td style={{ padding: '12px', textAlign: 'right', color: '#fff' }}>
-                    {user.contestRanking !== null &&
-                    user.contestRanking !== undefined &&
-                    user.contestRanking !== 'N/A'
-                      ? user.contestRanking
-                      : 'N/A'}
+                  <td style={{ ...cellStyle, textAlign: 'right' }}>
+                    {(user.contestRanking === "0" || user.contestRanking === "N/A")
+                      ? 'N/A'
+                      : user.contestRanking}
                   </td>
                 )}
               </tr>
@@ -154,6 +203,13 @@ const LCLeaderboard = () => {
           </tbody>
         </table>
       </div>
+      <style>
+        {`
+          .leaderboard-row:hover {
+            background-color: #333333;
+          }
+        `}
+      </style>
     </div>
   );
 };

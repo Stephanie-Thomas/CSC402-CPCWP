@@ -21,6 +21,7 @@ public class WccpcBackendApplication {
         return new RestTemplate();
     }
 
+    // Manually set to look for redis on port 6379
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration("redis", 6379);

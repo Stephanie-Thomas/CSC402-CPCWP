@@ -23,13 +23,12 @@ const CodeforcesLeaderboard = () => {
       });
   }, []);
 
-  // Styles
   const containerStyle = {
-    backgroundColor: '#ffffff',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    maxWidth: '900px',
+    margin: '2rem auto',
+    backgroundColor: '#1a1a1a',
     borderRadius: '8px',
-    maxWidth: '800px',
-    margin: '20px auto',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
     overflowX: 'auto',
   };
 
@@ -45,22 +44,28 @@ const CodeforcesLeaderboard = () => {
   };
 
   const headerCellStyle = {
-    fontWeight: 'bold',
-    padding: '12px',
+    padding: '14px 16px',
+    fontWeight: '600',
+    fontSize: '14px',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
   };
 
   const rowStyle = {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#2d2d2d',
+    borderBottom: '1px solid #444',
+    transition: 'background-color 0.2s ease',
   };
 
   const cellStyle = {
-    padding: '12px',
-    color: '#333333',
+    padding: '14px 16px',
+    color: '#e0e0e0',
+    fontSize: '14px',
   };
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '20px' }}>
+      <div style={{ textAlign: 'center', padding: '20px', color: '#ffffff' }}>
         <p>Loading Codeforces data...</p>
       </div>
     );
@@ -68,7 +73,7 @@ const CodeforcesLeaderboard = () => {
 
   if (error) {
     return (
-      <div style={{ textAlign: 'center', padding: '20px', color: 'red' }}>
+      <div style={{ textAlign: 'center', padding: '20px', color: '#ff4444' }}>
         <p>{error}</p>
       </div>
     );
@@ -93,7 +98,7 @@ const CodeforcesLeaderboard = () => {
               className="leaderboard-row"
               style={rowStyle}
             >
-              <th scope="row" style={{ ...cellStyle, textAlign: 'left' }}>
+              <th scope="row" style={{ ...cellStyle, textAlign: 'left', fontWeight: '500' }}>
                 {user.username}
               </th>
               <td style={{ ...cellStyle, textAlign: 'right' }}>
@@ -115,8 +120,7 @@ const CodeforcesLeaderboard = () => {
       <style>
         {`
           .leaderboard-row:hover {
-            background-color: #e9ecef;
-            cursor: pointer;
+            background-color: #333333;
           }
         `}
       </style>
