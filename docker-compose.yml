@@ -1,4 +1,3 @@
-
 services:
   leetcode_api:
     build:
@@ -30,23 +29,25 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true
     depends_on:
-      - backend
+      - backend-spring
     
-  backend:
-    build: ./backend
-    container_name: backend
+  backend-spring:
+    build:
+      context: ./backend-spring
+      dockerfile: Dockerfile
+    container_name: backend-spring
     ports:
       - "4000:4000"
     depends_on:
       - redis
       - leetcode_api
     environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - PORT=4000
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
 
   redis:
     image: redis:alpine
     container_name: redis
     ports:
-      - "6379:6379"  #For external access
+      - "6379:6379"  # For external access
+    
