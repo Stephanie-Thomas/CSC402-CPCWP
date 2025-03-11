@@ -17,7 +17,6 @@ services:
       - ./leetcode-api:/usr/src/app
       - /usr/src/app/node_modules
     
-
   frontend:
     build: ./frontend
     container_name: frontend
@@ -49,5 +48,5 @@ services:
     image: redis:alpine
     container_name: redis
     ports:
-      - "6379:6379"  # For external access
+      - "6379:6379"  
     
