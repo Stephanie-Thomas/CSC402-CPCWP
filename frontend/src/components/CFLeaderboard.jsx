@@ -24,48 +24,46 @@ const CodeforcesLeaderboard = () => {
   }, []);
 
   const containerStyle = {
-    maxWidth: '900px',
-    margin: '2rem auto',
-    backgroundColor: '#1a1a1a',
-    borderRadius: '8px',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+    maxWidth: '800px',
+    margin: '1.5rem auto',
+    backgroundColor: '#ffffff',
+    borderRadius: '6px',
+    border: '1px solid #e0e0e0',
     overflowX: 'auto',
   };
 
   const tableStyle = {
     width: '100%',
     borderCollapse: 'collapse',
-    minWidth: '650px',
+    minWidth: '600px',
   };
 
   const headerStyle = {
-    backgroundColor: '#212121',
-    color: '#ffffff',
+    backgroundColor: '#f8f9fa',
+    color: '#2d2d2d',
   };
 
   const headerCellStyle = {
-    padding: '14px 16px',
-    fontWeight: '600',
-    fontSize: '14px',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
+    padding: '12px 16px',
+    fontWeight: '500',
+    fontSize: '13px',
+    textAlign: 'left',
   };
 
   const rowStyle = {
-    backgroundColor: '#2d2d2d',
-    borderBottom: '1px solid #444',
-    transition: 'background-color 0.2s ease',
+    backgroundColor: '#ffffff',
+    borderBottom: '1px solid #e0e0e0',
   };
 
   const cellStyle = {
-    padding: '14px 16px',
-    color: '#e0e0e0',
+    padding: '12px 16px',
+    color: '#444',
     fontSize: '14px',
   };
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '20px', color: '#ffffff' }}>
+      <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
         <p>Loading Codeforces data...</p>
       </div>
     );
@@ -73,7 +71,7 @@ const CodeforcesLeaderboard = () => {
 
   if (error) {
     return (
-      <div style={{ textAlign: 'center', padding: '20px', color: '#ff4444' }}>
+      <div style={{ textAlign: 'center', padding: '20px', color: '#dc3545' }}>
         <p>{error}</p>
       </div>
     );
@@ -84,7 +82,7 @@ const CodeforcesLeaderboard = () => {
       <table style={tableStyle} aria-label="Codeforces leaderboard">
         <thead style={headerStyle}>
           <tr>
-            <th style={{ ...headerCellStyle, textAlign: 'left' }}>Username</th>
+            <th style={headerCellStyle}>Username</th>
             <th style={{ ...headerCellStyle, textAlign: 'right' }}>Rating</th>
             <th style={{ ...headerCellStyle, textAlign: 'right' }}>Max Rating</th>
             <th style={{ ...headerCellStyle, textAlign: 'right' }}>Rank</th>
@@ -98,9 +96,9 @@ const CodeforcesLeaderboard = () => {
               className="leaderboard-row"
               style={rowStyle}
             >
-              <th scope="row" style={{ ...cellStyle, textAlign: 'left', fontWeight: '500' }}>
+              <td style={{ ...cellStyle, fontWeight: '500' }}>
                 {user.username}
-              </th>
+              </td>
               <td style={{ ...cellStyle, textAlign: 'right' }}>
                 {user.rating || 'N/A'}
               </td>
@@ -120,7 +118,7 @@ const CodeforcesLeaderboard = () => {
       <style>
         {`
           .leaderboard-row:hover {
-            background-color: #333333;
+            background-color: #f8f9fa !important;
           }
         `}
       </style>

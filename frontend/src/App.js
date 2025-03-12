@@ -5,7 +5,7 @@ import LeaderboardToggle from './components/LeaderboardToggle';
 const App = () => {
   return (
     <div>
-      <h1>LeetCode Stats Viewer</h1>
+      <h1>WCCPC Stats Viewer</h1>
       <LeaderboardToggle/>
     </div>
   );

@@ -52,73 +52,66 @@ const LCLeaderboard = () => {
       })
     : leaderboard;
 
-  const containerStyle = {
-    maxWidth: '900px',
-    margin: '2rem auto',
-    backgroundColor: '#1a1a1a',
-    borderRadius: '8px',
-    padding: '20px',
-  };
-
-  const buttonContainerStyle = {
-    display: 'flex',
-    gap: '10px',
-    justifyContent: 'center',
-    marginBottom: '20px',
-  };
-
-  const buttonStyle = {
-    padding: '8px 20px',
-    border: 'none',
-    borderRadius: '4px',
-    backgroundColor: '#212121',
-    color: '#ffffff',
-    fontSize: '14px',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s ease',
-  };
-
-  const activeButtonStyle = {
-    ...buttonStyle,
-    backgroundColor: '#4285f4',
-  };
-
-  const tableContainerStyle = {
-    backgroundColor: '#1a1a1a',
-    borderRadius: '8px',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
-    overflowX: 'auto',
-  };
-
-  const tableStyle = {
-    width: '100%',
-    borderCollapse: 'collapse',
-  };
-
-  const headerStyle = {
-    backgroundColor: '#212121',
-    color: '#ffffff',
-  };
-
-  const headerCellStyle = {
-    padding: '14px 16px',
-    fontWeight: '600',
-    fontSize: '14px',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-  };
-
-  const rowStyle = {
-    backgroundColor: '#2d2d2d',
-    borderBottom: '1px solid #444',
-    transition: 'background-color 0.2s ease',
-  };
-
-  const cellStyle = {
-    padding: '14px 16px',
-    color: '#e0e0e0',
-    fontSize: '14px',
-  };
+    const containerStyle = {
+      maxWidth: '800px',
+      margin: '1.5rem auto',
+      backgroundColor: '#ffffff',
+      borderRadius: '6px',
+      border: '1px solid #e0e0e0',
+    };
+  
+    const buttonContainerStyle = {
+      display: 'flex',
+      gap: '8px',
+      justifyContent: 'center',
+      marginBottom: '16px',
+    };
+  
+    const buttonStyle = {
+      padding: '6px 16px',
+      border: '1px solid #e0e0e0',
+      borderRadius: '4px',
+      backgroundColor: '#ffffff',
+      color: '#444',
+      fontSize: '13px',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease',
+    };
+  
+    const activeButtonStyle = {
+      ...buttonStyle,
+      backgroundColor: '#e3f2fd',
+      borderColor: '#2196f3',
+      color: '#2196f3',
+    };
+  
+    const tableContainerStyle = {
+      backgroundColor: '#ffffff',
+      borderRadius: '6px',
+      overflowX: 'auto',
+    };
+  
+    const headerStyle = {
+      backgroundColor: '#f8f9fa',
+      color: '#2d2d2d',
+    };
+  
+    const headerCellStyle = {
+      padding: '12px 16px',
+      fontWeight: '500',
+      fontSize: '13px',
+    };
+  
+    const rowStyle = {
+      backgroundColor: '#ffffff',
+      borderBottom: '1px solid #e0e0e0',
+    };
+  
+    const cellStyle = {
+      padding: '12px 16px',
+      color: '#444',
+      fontSize: '14px',
+    };
 
   if (loading) {
     return (
@@ -154,13 +147,19 @@ const LCLeaderboard = () => {
       </div>
 
       {viewMode === 'contest' && contestTitle && (
-        <h6 style={{ textAlign: 'center', marginBottom: '20px', color: '#ffffff', fontSize: '16px' }}>
+        <h6 style={{ 
+          textAlign: 'center', 
+          marginBottom: '16px', 
+          color: '#666', 
+          fontSize: '14px',
+          fontWeight: '500'
+          }}>
           {contestTitle}
         </h6>
       )}
 
       <div style={tableContainerStyle}>
-        <table style={tableStyle}>
+        <table>
           <thead style={headerStyle}>
             <tr>
               <th style={{ ...headerCellStyle, textAlign: 'left' }}>Username</th>
@@ -206,7 +205,7 @@ const LCLeaderboard = () => {
       <style>
         {`
           .leaderboard-row:hover {
-            background-color: #333333;
+            background-color: #f8f9fa;
           }
         `}
       </style>
