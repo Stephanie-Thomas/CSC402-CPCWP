@@ -57,7 +57,7 @@ public class LeaderboardController {
                 );
             }).collect(Collectors.toList());
 
-            redisTemplate.opsForValue().set(cacheKey, objectMapper.writeValueAsString(leaderboard), 300, TimeUnit.SECONDS);
+            redisTemplate.opsForValue().set(cacheKey, objectMapper.writeValueAsString(leaderboard), 15, TimeUnit.MINUTES);
             logger.info("Codeforces leaderboard data cached in Redis");
             return ResponseEntity.ok(leaderboard);
         } catch (Exception e) {
@@ -156,7 +156,7 @@ public class LeaderboardController {
                 return Integer.compare(Integer.parseInt(a.getContestRanking()), Integer.parseInt(b.getContestRanking()));
             });
 
-            redisTemplate.opsForValue().set(cacheKey, objectMapper.writeValueAsString(leaderboard), 300, TimeUnit.SECONDS);
+            redisTemplate.opsForValue().set(cacheKey, objectMapper.writeValueAsString(leaderboard), 15, TimeUnit.MINUTES);
             logger.info("LeetCode leaderboard data (with global contest ranking) cached in Redis");
             return ResponseEntity.ok(leaderboard);
         } catch (Exception e) {
