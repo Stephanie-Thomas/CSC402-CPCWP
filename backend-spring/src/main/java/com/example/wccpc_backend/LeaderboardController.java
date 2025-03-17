@@ -53,9 +53,7 @@ public class LeaderboardController {
                 return new CodeforcesUser(
                         userData.get("handle").asText(),
                         userData.get("rating").isNull() ? null : userData.get("rating").asInt(),
-                        userData.get("maxRating").isNull() ? null : userData.get("maxRating").asInt(),
-                        userData.get("rank").isNull() ? "N/A" : userData.get("rank").asText(),
-                        userData.get("maxRank").isNull() ? "N/A" : userData.get("maxRank").asText()
+                        userData.get("rank").isNull() ? "N/A" : userData.get("rank").asText()
                 );
             }).collect(Collectors.toList());
 

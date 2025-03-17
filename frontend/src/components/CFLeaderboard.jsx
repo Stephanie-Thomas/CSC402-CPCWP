@@ -84,9 +84,9 @@ const CodeforcesLeaderboard = () => {
           <tr>
             <th style={headerCellStyle}>Username</th>
             <th style={{ ...headerCellStyle, textAlign: 'right' }}>Rating</th>
-            <th style={{ ...headerCellStyle, textAlign: 'right' }}>Max Rating</th>
+            
             <th style={{ ...headerCellStyle, textAlign: 'right' }}>Rank</th>
-            <th style={{ ...headerCellStyle, textAlign: 'right' }}>Max Rank</th>
+            
           </tr>
         </thead>
         <tbody>
@@ -102,14 +102,9 @@ const CodeforcesLeaderboard = () => {
               <td style={{ ...cellStyle, textAlign: 'right' }}>
                 {user.rating || 'N/A'}
               </td>
-              <td style={{ ...cellStyle, textAlign: 'right' }}>
-                {user.maxRating || 'N/A'}
-              </td>
+  
               <td style={{ ...cellStyle, textAlign: 'right' }}>
                 {user.rank || 'N/A'}
-              </td>
-              <td style={{ ...cellStyle, textAlign: 'right' }}>
-                {user.maxRank || 'N/A'}
               </td>
             </tr>
           ))}
