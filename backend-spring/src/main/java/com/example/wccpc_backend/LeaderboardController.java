@@ -83,7 +83,7 @@ public class LeaderboardController {
         }
 
         try {
-            List<String> users = Arrays.asList("kmatotek", "jetacop384");
+            List<String> users = Arrays.asList("kmatotek", "linhbngo"); //"jetacop384"
             Map<String, JsonNode> profileDataMap = new HashMap<>();
             Map<String, JsonNode> contestHistoryMap = new HashMap<>();
 
