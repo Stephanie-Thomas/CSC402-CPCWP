@@ -115,7 +115,7 @@ const LCLeaderboard = () => {
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '20px', color: '#ffffff' }}>
+      <div style={{ textAlign: 'center', padding: '20px', color: 'black' }}>
         <p>Loading LeetCode data...</p>
       </div>
     );

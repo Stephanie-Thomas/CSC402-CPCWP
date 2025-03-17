@@ -63,7 +63,7 @@ const CodeforcesLeaderboard = () => {
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
+      <div style={{ textAlign: 'center', padding: '20px', color: 'black' }}>
         <p>Loading Codeforces data...</p>
       </div>
     );
