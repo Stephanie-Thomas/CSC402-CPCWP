@@ -14,7 +14,13 @@ const CodeforcesLeaderboard = () => {
         return response.json();
       })
       .then((data) => {
-        setLeaderboard(data);
+        // Sort by rating descending, with nulls (N/A) at the bottom
+        const sortedData = [...data].sort((a, b) => {
+          const ratingA = a.rating ?? -Infinity; // Treat null as lowest possible
+          const ratingB = b.rating ?? -Infinity;
+          return ratingB - ratingA; // Descending order
+        });
+        setLeaderboard(sortedData);
         setLoading(false);
       })
       .catch((err) => {
@@ -84,9 +90,7 @@ const CodeforcesLeaderboard = () => {
           <tr>
             <th style={headerCellStyle}>Username</th>
             <th style={{ ...headerCellStyle, textAlign: 'right' }}>Rating</th>
-            
             <th style={{ ...headerCellStyle, textAlign: 'right' }}>Rank</th>
-            
           </tr>
         </thead>
         <tbody>
@@ -100,9 +104,8 @@ const CodeforcesLeaderboard = () => {
                 {user.username}
               </td>
               <td style={{ ...cellStyle, textAlign: 'right' }}>
-                {user.rating || 'N/A'}
+                {user.rating?.toLocaleString() || 'N/A'}
               </td>
-  
               <td style={{ ...cellStyle, textAlign: 'right' }}>
                 {user.rank || 'N/A'}
               </td>

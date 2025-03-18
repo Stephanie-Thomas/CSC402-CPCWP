@@ -30,41 +30,66 @@ public class LeaderboardController {
 
     @GetMapping("/api/codeforces-leaderboard")
     public ResponseEntity<?> getCodeforcesLeaderboard() {
-        String cacheKey = "Codeforcesleaderboard";
+    String cacheKey = "Codeforcesleaderboard";
 
-        try {
-            String cachedData = redisTemplate.opsForValue().get(cacheKey);
-            if (cachedData != null) {
-                logger.info("Returning cached Codeforces leaderboard data from Redis");
-                List<CodeforcesUser> leaderboard = objectMapper.readValue(cachedData, 
-                        objectMapper.getTypeFactory().constructCollectionType(List.class, CodeforcesUser.class));
-                return ResponseEntity.ok(leaderboard);
-            }
-        } catch (Exception e) {
-            logger.error("Error accessing Redis cache: ", e);
+    try {
+        String cachedData = redisTemplate.opsForValue().get(cacheKey);
+        if (cachedData != null) {
+            logger.info("Returning cached Codeforces leaderboard data from Redis");
+            List<CodeforcesUser> leaderboard = objectMapper.readValue(cachedData, 
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, CodeforcesUser.class));
+            return ResponseEntity.ok(leaderboard);
         }
+    } catch (Exception e) {
+        logger.error("Error accessing Redis cache: ", e);
+    }
 
-        try {
-            List<String> users = Arrays.asList("tourist", "Petr", "Benq", "Radewoosh", "mnbvmar", "hello");
-            List<CodeforcesUser> leaderboard = users.stream().map(user -> {
+    try {
+        List<String> users = Arrays.asList("ap0209", "marybauman", "parmort", "bwc9876", "noah_lot", "cc976948"); 
+        List<CodeforcesUser> leaderboard = users.stream().map(user -> {
+            try {
                 String url = "https://codeforces.com/api/user.info?handles=" + user;
                 JsonNode response = restTemplate.getForObject(url, JsonNode.class);
-                JsonNode userData = response.get("result").get(0);
-                return new CodeforcesUser(
-                        userData.get("handle").asText(),
-                        userData.get("rating").isNull() ? null : userData.get("rating").asInt(),
-                        userData.get("rank").isNull() ? "N/A" : userData.get("rank").asText()
-                );
-            }).collect(Collectors.toList());
+                
+                // Check if response is valid
+                if (response == null || 
+                    !response.has("status") || 
+                    !"OK".equals(response.get("status").asText()) || 
+                    !response.has("result")) {
+                    return new CodeforcesUser(user, null, "N/A");
+                }
 
-            redisTemplate.opsForValue().set(cacheKey, objectMapper.writeValueAsString(leaderboard), 15, TimeUnit.MINUTES);
-            logger.info("Codeforces leaderboard data cached in Redis");
-            return ResponseEntity.ok(leaderboard);
-        } catch (Exception e) {
-            logger.error("Error fetching Codeforces leaderboard: ", e);
-            return ResponseEntity.status(500).body("Failed to fetch leaderboard data");
-        }
+                JsonNode resultArray = response.get("result");
+                if (!resultArray.isArray() || resultArray.isEmpty()) {
+                    return new CodeforcesUser(user, null, "N/A");
+                }
+
+                JsonNode userData = resultArray.get(0);
+                String handle = userData.has("handle") ? userData.get("handle").asText() : user;
+                Integer rating = userData.has("rating") && !userData.get("rating").isNull() 
+                                ? userData.get("rating").asInt() 
+                                : null;
+                String rank = userData.has("rank") && !userData.get("rank").isNull() 
+                             ? userData.get("rank").asText() 
+                             : "N/A";
+
+                return new CodeforcesUser(handle, rating, rank);
+            } catch (Exception e) {
+                logger.error("Error processing user {}: {}", user, e.getMessage());
+                return new CodeforcesUser(user, null, "N/A");
+            }
+        }).collect(Collectors.toList());
+
+        redisTemplate.opsForValue().set(cacheKey, objectMapper.writeValueAsString(leaderboard), 15, TimeUnit.MINUTES);
+        logger.info("Codeforces leaderboard data cached in Redis");
+        return ResponseEntity.ok(leaderboard);
+    } catch (Exception e) {
+        logger.error("Error fetching Codeforces leaderboard: ", e);
+        return ResponseEntity.status(500).body("Failed to fetch leaderboard data");
     }
+}
+    
+    
 
     @GetMapping("/api/leetcode-leaderboard")
     public ResponseEntity<?> getLeetcodeLeaderboard() {
