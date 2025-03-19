@@ -28,21 +28,22 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true
     depends_on:
-      - backend-spring
+      - backend-node
     
-  backend-spring:
+  backend-node:
     build:
-      context: ./backend-spring
+      context: ./backend-node
       dockerfile: Dockerfile
-    container_name: backend-spring
+    container_name: backend-node
     ports:
       - "4000:4000"
     depends_on:
       - redis
       - leetcode_api
     environment:
-      - SPRING_REDIS_HOST=redis
-      - SPRING_REDIS_PORT=6379
+    - REDIS_HOST=redis 
+    - REDIS_PORT=6379
+  
 
   redis:
     image: redis:alpine

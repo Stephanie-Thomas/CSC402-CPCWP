@@ -186,7 +186,7 @@ const LCLeaderboard = () => {
                     {user.totalSolved || 'N/A'}
                   </td>
                   <td style={{ ...cellStyle, textAlign: 'right' }}>
-                    {user.ranking || 'N/A'}
+                    {user.overallRanking || 'N/A'}
                   </td>
                 </>
               ) : (

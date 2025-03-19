@@ -101,7 +101,7 @@ const CodeforcesLeaderboard = () => {
               style={rowStyle}
             >
               <td style={{ ...cellStyle, fontWeight: '500' }}>
-                {user.username}
+                {user.handle}
               </td>
               <td style={{ ...cellStyle, textAlign: 'right' }}>
                 {user.rating?.toLocaleString() || 'N/A'}
