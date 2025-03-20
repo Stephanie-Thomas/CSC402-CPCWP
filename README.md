@@ -14,3 +14,4 @@ Austin Lam
 Connor Hill
 Tobias Bussiek
 Tristan Braun
+Stephanie Thomas
