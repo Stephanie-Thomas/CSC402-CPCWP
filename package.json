@@ -1,0 +1,26 @@
+{
+  "name": "csc402-cpcwp",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Stephanie-Thomas/CSC402-CPCWP.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Stephanie-Thomas/CSC402-CPCWP/issues"
+  },
+  "homepage": "https://github.com/Stephanie-Thomas/CSC402-CPCWP#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.0.0",
+    "body-parser": "^1.20.2",
+    "ejs": "^3.1.9"
+  }
+}
