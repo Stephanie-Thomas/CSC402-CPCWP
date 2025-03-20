@@ -19,3 +19,11 @@ mongoose.connect(MONGODB_URI, {
     console.log('Connection Error: ', err);
 });
 
+const userSchema = new mongoose.Schema({
+    firstName: String,
+    lastName: String,
+    email: String
+});
+
+const User = mongoose.model('User', userSchema);
+
