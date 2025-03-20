@@ -41,8 +41,12 @@ services:
       - redis
       - leetcode_api
     environment:
-    - REDIS_HOST=redis 
-    - REDIS_PORT=6379
+      - REDIS_HOST=redis 
+      - REDIS_PORT=6379
+      - MONGO_URI=${MONGO_URI}  # Load from .env file
+    env_file:
+      - .env
+
   
 
   redis:
