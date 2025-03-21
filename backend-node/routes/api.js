@@ -155,4 +155,26 @@ router.get('/leetcode-leaderboard', async (req, res) => {
     }
 });
 
+router.post('/register', async (req, res) => {
+    try {
+        const {name, email} = req.body;
+        //Checks if fields are filled out
+        if (!name || !email) {
+            return res.status(400).json({ message: "Name and email required"});
+        }
+        //Checks if email is already in use
+        const existingEmail = await User.findOne({ email });
+        if (existingEmail) {
+            return res.status(400).json({message: "Email already in use"});
+        }
+        //Create new user doc
+        const newUser = new User({name, email});
+        await newUser.save();
+
+        return res.status(201).jason({message: "Successfully registered"});
+    } catch (error) {
+        console.error("Errot during registration:", error);
+        return res.status(500).json({message: "Internal Server Error"});
+    }
+});
 module.exports = router;
