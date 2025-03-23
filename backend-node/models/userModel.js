@@ -4,8 +4,8 @@ const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    leetcodeUsername: { type: String, required: true },
-    codeforcesUsername: { type: String, required: true }
+    leetcodeUsername: { type: String, required: false },
+    codeforcesUsername: { type: String, required: false }
   }, { timestamps: true });
 
 //Lets you query and manipulate the users within MongoDB whenever require("User") is used in code

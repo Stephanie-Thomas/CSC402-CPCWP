@@ -162,9 +162,13 @@ router.post('/register', async (req, res) => {
     const { name, email, leetcodeUsername, codeforcesUsername } = req.body;
 
     // Check for required fields
-    if (!name || !email || !leetcodeUsername || !codeforcesUsername) {
-      return res.status(400).json({ message: "All fields are required." });
-    }
+    if (!name || !email) {
+        return res.status(400).json({ message: "Name and email are required." });
+      }
+      
+      if (!leetcodeUsername && !codeforcesUsername) {
+        return res.status(400).json({ message: "At least one username (LeetCode or Codeforces) is required." });
+      }
 
     // Check if email is already registered
     const existingEmail = await User.findOne({ email });
@@ -176,8 +180,8 @@ router.post('/register', async (req, res) => {
     const newUser = new User({
       name,
       email,
-      leetcodeUsername,
-      codeforcesUsername
+      leetcodeUsername: leetcodeUsername || null,
+      codeforcesUsername: codeforcesUsername || null
     });
 
     await newUser.save();
@@ -187,5 +191,16 @@ router.post('/register', async (req, res) => {
     console.error("Error during registration:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
+// GET /api/users – fetch all registered users
+router.get('/users', async (req, res) => {
+    try {
+      const users = await User.find({}, 'name email leetcodeUsername codeforcesUsername'); // only return select fields
+      res.status(200).json(users);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+  
 });
 module.exports = router;
