@@ -4,8 +4,7 @@ services:
       context: ./leetcode-api
       dockerfile: Dockerfile
     container_name: leetcode-api
-    ports:
-      - "3000:3000"
+    ports: []
     restart: always
     environment:
       - WDS_SOCKET_HOST=127.0.0.1
@@ -35,8 +34,7 @@ services:
       context: ./backend-node
       dockerfile: Dockerfile
     container_name: backend-node
-    ports:
-      - "4000:4000"
+    ports: []
     depends_on:
       - redis
       - leetcode_api
@@ -46,9 +44,7 @@ services:
       - MONGO_URI=${MONGO_URI}  # Load from .env file
     env_file:
       - .env
-
-  
-
+      
   redis:
     image: redis:alpine
     container_name: redis
