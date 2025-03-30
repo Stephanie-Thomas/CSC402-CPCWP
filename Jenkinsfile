@@ -1,8 +1,5 @@
 pipeline {
-    agent { 
-        label 'docker-agent-python'
-        args '-v /var/run/docker.sock:/var/run/docker.sock'
-    }
+    agent { label 'docker-agent-python' }
     triggers { pollSCM '* * * * *' }
     environment {
         COMPOSE_PROJECT_NAME = "jenkins-test-${BUILD_NUMBER}"
