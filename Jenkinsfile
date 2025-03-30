@@ -1,12 +1,10 @@
 pipeline {
-    agent { 
-        node {
-            label 'docker-agent-python'
-        }
-        triggers {
-            pollSCM '* * * * *' // check every 1 min for commits
-        }
-      }
+    agent {
+        label 'docker-agent-python'  // Simplified agent declaration
+    }
+    triggers {
+        pollSCM '* * * * *'  // Check every 1 min for commits
+    }
     stages {
         stage('Build') {
             steps {
