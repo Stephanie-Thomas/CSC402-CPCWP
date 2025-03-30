@@ -1,17 +1,13 @@
 pipeline {
-    agent {
-        label 'docker-agent-python'  // Ensure this agent has Docker Compose installed
-    }
-    triggers {
-        pollSCM '* * * * *'  // Check every 1 min for commits
-    }
+    agent { label 'docker-agent-python' }
+    triggers { pollSCM '* * * * *' }
     environment {
-        COMPOSE_PROJECT_NAME = "jenkins-test-${BUILD_NUMBER}"  // Unique project name per build
+        COMPOSE_PROJECT_NAME = "jenkins-test-${BUILD_NUMBER}"
     }
     stages {
         stage('Checkout') {
             steps {
-                checkout scm  // Ensure code is checked out
+                checkout scm
             }
         }
         stage('Build & Test') {
@@ -19,10 +15,9 @@ pipeline {
                 script {
                     echo "Running docker-compose build and up..."
                     sh '''
-                    docker compose up --build -d  # Start in detached mode
-                    sleep 30  # Wait for services to initialize
-                    docker compose ps  # Show running services
-                    
+                    docker-compose up --build -d
+                    sleep 30
+                    docker-compose ps
                     '''
                 }
             }
@@ -30,7 +25,7 @@ pipeline {
                 always {
                     echo "Cleaning up containers..."
                     sh '''
-                    docker compose down --volumes --remove-orphans
+                    docker-compose down --volumes --remove-orphans
                     '''
                 }
             }
@@ -40,8 +35,7 @@ pipeline {
                 script {
                     echo "Verifying service health..."
                     sh '''
-                    # Example: Check if backend is responding
-                    
+                    curl --retry 5 --retry-delay 5 --retry-connrefused http://localhost:3001/api/health
                     '''
                 }
             }
@@ -49,7 +43,6 @@ pipeline {
         stage('Deliver') {
             steps {
                 echo "Delivery placeholder..."
-                // Add your delivery steps here
             }
         }
     }
