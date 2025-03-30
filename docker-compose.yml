@@ -60,6 +60,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock 
     user: root
     platform: linux/amd64 
+    privileged: true 
   redis:
     image: redis:alpine
     container_name: redis
