@@ -1,7 +1,7 @@
 pipeline {
     agent { 
         node {
-            label 'jenkins-agent-goes-here'
+            label 'docker-agent-python'
         }
         triggers {
             pollSCM '*/5 * * * *' // check every 5 min for commits
