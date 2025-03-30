@@ -1,22 +1,36 @@
 pipeline {
-  agent {
-    docker {
-      image 'jenkins/agent:alpine-jdk17'
-      args '-u root --network host'
-      label 'docker-agent-alpine' // Must match your cloud template
-    }
-  }
-  stages {
-    stage('Setup') {
-      steps {
-        checkout scm
-        sh 'apk add --no-cache python3'
+    agent { 
+        node {
+            label 'jenkins-agent-goes-here'
+        }
+        triggers {
+            pollSCM '*/5 * * * *' // check every 5 min for commits
+        }
       }
+    stages {
+        stage('Build') {
+            steps {
+                echo "Building.."
+                sh '''
+                echo "doing build stuff.."
+                '''
+            }
+        }
+        stage('Test') {
+            steps {
+                echo "Testing.."
+                sh '''
+                echo "doing test stuff.."
+                '''
+            }
+        }
+        stage('Deliver') {
+            steps {
+                echo 'Deliver....'
+                sh '''
+                echo "doing delivery stuff.."
+                '''
+            }
+        }
     }
-    stage('Run') {
-      steps {
-        sh 'python3 helloworld.py'
-      }
-    }
-  }
 }
