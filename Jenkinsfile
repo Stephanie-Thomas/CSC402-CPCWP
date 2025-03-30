@@ -4,7 +4,7 @@ pipeline {
             label 'docker-agent-python'
         }
         triggers {
-            pollSCM '*/5 * * * *' // check every 5 min for commits
+            pollSCM '* * * * *' // check every 1 min for commits
         }
       }
     stages {
