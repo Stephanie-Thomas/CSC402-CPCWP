@@ -1,0 +1,39 @@
+name: Testing
+
+on:
+  push:
+    branches:
+      - Docker
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Start Containers
+        run: docker compose up --build -d
+
+      - name: Check service connectivity
+        run: |
+          for port in 3000 3001 4000 6379; do
+            echo "Checking port $port..."
+            timeout 10 bash -c "until echo > /dev/tcp/localhost/$port; do sleep 1; done"
+            echo "Port $port is accessible."
+          done
+        
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r tests/requirements.txt
+      
+      - name: Run leaderboard tests
+        run: pytest tests/test_api.py -v
+
+      - name: Stop Containers
+        run: docker compose down
