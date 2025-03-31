@@ -21,7 +21,6 @@ jobs:
         uses: docker/setup-buildx-action@v3
         with:
           driver-opts: |
-            # Use a local filesystem cache
             image=moby/buildkit:master
             network=host
 
