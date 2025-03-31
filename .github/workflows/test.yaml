@@ -6,8 +6,8 @@ on:
       - CI/CD
 
 env:
-  DOCKER_BUILDKIT: 1  # Enable BuildKit
-  COMPOSE_DOCKER_CLI_BUILD: 1  # Use Docker CLI for builds
+  DOCKER_BUILDKIT: 1
+  COMPOSE_DOCKER_CLI_BUILD: 1
 
 jobs:
   test:
@@ -36,7 +36,6 @@ jobs:
       - name: Build services in parallel
         run: docker compose build --parallel
         env:
-          # Tell BuildKit to use the cached layers
           BUILDKIT_INLINE_CACHE: 1
 
       - name: Start Containers
