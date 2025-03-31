@@ -19,6 +19,13 @@ jobs:
       - name: Start Containers
         run: docker compose up --build -d
 
-     
+      - name: Check service connectivity
+        run: |
+          for port in 3000 3001 4000 6379; do
+            echo "Checking port $port..."
+            timeout 10 bash -c "until echo > /dev/tcp/localhost/$port; do sleep 1; done"
+            echo "Port $port is accessible."
+          done
+
       - name: Stop Containers
         run: docker compose down
