@@ -13,14 +13,15 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Create Cache Directory
+        run: mkdir -p ~/.docker/buildx-cache
+
       - name: Cache Docker Buildx
         uses: actions/cache@v4
         id: docker-cache
         with:
-          path: |
-            ~/.docker/buildx-cache
-            /tmp/buildx
-          key: ${{ runner.os }}-docker-buildx-${{ hashFiles('**/Dockerfile', '**/docker-compose.yml', '**/package*.json') }}
+          path: ~/.docker/buildx-cache
+          key: ${{ runner.os }}-docker-buildx-${{ hashFiles('**/Dockerfile', '**/docker-compose.yml') }}
           restore-keys: |
             ${{ runner.os }}-docker-buildx-
 
@@ -29,16 +30,15 @@ jobs:
         with:
           driver-opts: |
             image=moby/buildkit:master
-          buildkitd-flags: --debug --allow-insecure-entitlement security.insecure
+          buildkitd-flags: --debug
 
-      - name: Build with Cache
+      - name: Build Services
         run: |
-          docker buildx build \
-            --cache-from type=local,src=~/.docker/buildx-cache \
-            --cache-to type=local,dest=~/.docker/buildx-cache,mode=max \
-            --progress plain \
-            -f docker-compose.yml \
-            .
+          docker buildx bake \
+            --file docker-compose.yml \
+            --set *.cache-from=type=local,src=$HOME/.docker/buildx-cache \
+            --set *.cache-to=type=local,dest=$HOME/.docker/buildx-cache,mode=max \
+            --progress plain
 
       - name: Start Containers
         run: docker compose up -d
