@@ -5,6 +5,10 @@ on:
     branches:
       - CI/CD
 
+env:
+  DOCKER_BUILDKIT: 1  # Enable BuildKit
+  COMPOSE_DOCKER_CLI_BUILD: 1  # Use Docker CLI for builds
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -13,17 +17,36 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
+      - name: Set up Docker Buildx (with caching)
         uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            # Use a local filesystem cache
+            image=moby/buildkit:master
+            network=host
+
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: buildx-${{ github.sha }}
+          restore-keys: |
+            buildx-
+
+      - name: Build services in parallel
+        run: docker compose build --parallel
+        env:
+          # Tell BuildKit to use the cached layers
+          BUILDKIT_INLINE_CACHE: 1
 
       - name: Start Containers
-        run: docker compose up --build -d
+        run: docker compose up -d
 
       - name: Check service connectivity
         run: |
           for port in 3000 3001 4000 6379; do
             echo "Checking port $port..."
-            timeout 10 bash -c "until echo > /dev/tcp/localhost/$port; do sleep 1; done"
+            timeout 30 bash -c "until echo > /dev/tcp/localhost/$port; do sleep 1; done"
             echo "Port $port is accessible."
           done
 
