@@ -5,10 +5,6 @@ on:
     branches:
       - CI/CD
 
-env:
-  DOCKER_BUILDKIT: 1
-  COMPOSE_DOCKER_CLI_BUILD: 1
-
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -17,25 +13,28 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx (with caching)
+      - name: Cache Docker Buildx
+        uses: actions/cache@v4
+        id: docker-cache
+        with:
+          path: ~/.docker/buildx-cache
+          key: ${{ runner.os }}-docker-buildx-${{ hashFiles('**/Dockerfile', '**/docker-compose.yml', '**/package*.json') }}
+          restore-keys: |
+            ${{ runner.os }}-docker-buildx-
+
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
           driver-opts: |
             image=moby/buildkit:master
-            network=host
 
-      - name: Cache Docker layers
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache
-          key: buildx-${{ github.sha }}
-          restore-keys: |
-            buildx-
-
-      - name: Build services in parallel
-        run: docker compose build --parallel
-        env:
-          BUILDKIT_INLINE_CACHE: 1
+      - name: Build with Bake and Cache
+        run: |
+          docker buildx bake \
+            --file docker-compose.yml \
+            --cache-from type=local,src=~/.docker/buildx-cache \
+            --cache-to type=local,dest=~/.docker/buildx-cache,mode=max \
+            --progress plain
 
       - name: Start Containers
         run: docker compose up -d
@@ -44,7 +43,7 @@ jobs:
         run: |
           for port in 3000 3001 4000 6379; do
             echo "Checking port $port..."
-            timeout 30 bash -c "until echo > /dev/tcp/localhost/$port; do sleep 1; done"
+            timeout 10 bash -c "until echo > /dev/tcp/localhost/$port; do sleep 1; done"
             echo "Port $port is accessible."
           done
 
