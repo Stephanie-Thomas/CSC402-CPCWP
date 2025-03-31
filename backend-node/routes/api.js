@@ -10,7 +10,6 @@ const router = express.Router();
 // Codeforces leaderboard endpoint
 router.get('/codeforces-leaderboard', async (req, res) => {
     const cacheKey = 'Codeforcesleaderboard';
-    return res.status(500).json({ error: 'Failed to fetch leaderboard data' });
     try {
         const cachedData = await redisClient.get(cacheKey);
         if (cachedData) {
