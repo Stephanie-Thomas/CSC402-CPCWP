@@ -29,6 +29,6 @@ mongoose.connect(process.env.MONGO_URI, {
 });
 
 // Middleware
-app.use(cors({ origin: 'https://dockerfrontendtest.onrender.com' })); // Allow frontend origin
+app.use(cors({ origin: 'https://csc402-cpcwp.onrender.com' })); // Allow frontend origin
 app.use(express.json());
 app.use('/api', apiRoutes);
