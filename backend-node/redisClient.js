@@ -1,10 +1,10 @@
 const redis = require('redis');
 
-// ✅ Strictly require the env variable in production
-const redisUrl = process.env.REDIS_URL;
+// Use the custom environment variable name
+const redisUrl = process.env['leaderboard-redis']; /
 
 if (!redisUrl) {
-  throw new Error('REDIS_URL environment variable is not set.');
+  throw new Error('leaderboard-redis environment variable is not set.');
 }
 
 const redisClient = redis.createClient({ url: redisUrl });
