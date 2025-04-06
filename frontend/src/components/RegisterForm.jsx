@@ -1,6 +1,6 @@
 // src/components/RegisterForm.jsx
 import React, { useState } from 'react';
-import './RegisterForm.css';
+
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
