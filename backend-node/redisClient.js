@@ -1,7 +1,7 @@
 const redis = require('redis');
 
 // Use the custom environment variable name
-const redisUrl = process.env['leaderboard-redis']; /
+const redisUrl = process.env['leaderboard-redis']; 
 
 if (!redisUrl) {
   throw new Error('leaderboard-redis environment variable is not set.');
