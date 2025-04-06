@@ -10,7 +10,10 @@ const LCLeaderboard = () => {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetch('/api/leetcode-leaderboard')
+    
+    const API_BASE = process.env.REACT_APP_BACKEND_URL;
+
+    fetch(`${API_BASE}/api/leetcode-leaderboard`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Failed to fetch LeetCode leaderboard data: ${response.status}`);
