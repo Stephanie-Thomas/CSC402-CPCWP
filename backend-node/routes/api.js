@@ -166,40 +166,34 @@ router.get('/leetcode-leaderboard', async (req, res) => {
 });
 
 router.post('/register', async (req, res) => {
-    try {
-      const { name, email, leetcodeUsername, codeforcesUsername } = req.body;
-  
-      // Check for required fields
-      if (!name || !email || !leetcodeUsername || !codeforcesUsername) {
-        return res.status(400).json({ message: "All fields are required." });
-      }
-  
-      // Validate WCU email
-      const emailDomainRegex = /^[a-zA-Z0-9._%+-]+@wcupa\.edu$/;
-      if (!emailDomainRegex.test(email)) {
-        return res.status(400).json({ message: "Only @wcupa.edu emails are allowed." });
-      }
-  
-      // Check if email is already registered
-      const existingEmail = await User.findOne({ email });
-      if (existingEmail) {
-        return res.status(400).json({ message: "Email already in use." });
-      }
-  
-      // Create and save the new user
-      const newUser = new User({
-        name,
-        email,
-        leetcodeUsername,
-        codeforcesUsername
-      });
-  
-      await newUser.save();
-      return res.status(201).json({ message: "Successfully registered." });
-  
-    } catch (error) {
-      console.error("Error during registration:", error);
-      return res.status(500).json({ message: "Internal Server Error" });
+  try {
+    const { name, email, leetcodeUsername, codeforcesUsername } = req.body;
+
+    // Check for required fields
+    if (!name || !email || !leetcodeUsername || !codeforcesUsername) {
+      return res.status(400).json({ message: "All fields are required." });
     }
-  });
+
+    // Check if email is already registered
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+      return res.status(400).json({ message: "Email already in use." });
+    }
+
+    // Create and save the new user
+    const newUser = new User({
+      name,
+      email,
+      leetcodeUsername,
+      codeforcesUsername
+    });
+
+    await newUser.save();
+    return res.status(201).json({ message: "Successfully registered." });
+
+  } catch (error) {
+    console.error("Error during registration:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+});
 module.exports = router;
