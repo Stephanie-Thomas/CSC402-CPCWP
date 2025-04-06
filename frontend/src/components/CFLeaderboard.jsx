@@ -6,7 +6,9 @@ const CodeforcesLeaderboard = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('/api/codeforces-leaderboard')
+    const API_BASE = process.env.REACT_APP_BACKEND_URL;
+  
+    fetch(`${API_BASE}/api/codeforces-leaderboard`)
       .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to fetch Codeforces leaderboard data');
@@ -14,11 +16,10 @@ const CodeforcesLeaderboard = () => {
         return response.json();
       })
       .then((data) => {
-        // Sort by rating descending, with nulls (N/A) at the bottom
         const sortedData = [...data].sort((a, b) => {
-          const ratingA = a.rating ?? -Infinity; // Treat null as lowest possible
+          const ratingA = a.rating ?? -Infinity;
           const ratingB = b.rating ?? -Infinity;
-          return ratingB - ratingA; // Descending order
+          return ratingB - ratingA;
         });
         setLeaderboard(sortedData);
         setLoading(false);
