@@ -23,7 +23,7 @@ const RegisterForm = () => {
     e.preventDefault();
 
     try {
-      const res = await fetch('/api/register', {
+      const res = await fetch('https://csc402-cpcwp.onrender.com/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
