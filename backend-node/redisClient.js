@@ -1,12 +1,11 @@
 // backend/redisClient.js
 const redis = require('redis');
 
-// Create and configure the Redis client using environment variables
+// Use the Redis connection string (from Render or local .env)
+const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+
 const redisClient = redis.createClient({
-  socket: {
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT || 6379,
-  },
+  url: redisUrl,
 });
 
 redisClient.on('error', (err) => {
@@ -17,7 +16,7 @@ redisClient.on('connect', () => {
   console.log('Connected to Redis');
 });
 
-// Connect to Redis asynchronously
+// Connect to Redis
 (async () => {
   try {
     await redisClient.connect();
