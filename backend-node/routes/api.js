@@ -10,54 +10,62 @@ const router = express.Router();
 // Codeforces leaderboard endpoint
 router.get('/codeforces-leaderboard', async (req, res) => {
     const cacheKey = 'Codeforcesleaderboard';
-
+  
     try {
-        const cachedData = await redisClient.get(cacheKey);
-        if (cachedData) {
-            console.log('Returning cached Codeforces leaderboard data from Redis');
-            return res.json(JSON.parse(cachedData));
-        }
+      const cachedData = await redisClient.get(cacheKey);
+      if (cachedData) {
+        console.log('Returning cached Codeforces leaderboard data from Redis');
+        return res.json(JSON.parse(cachedData));
+      }
     } catch (error) {
-        console.error('Error accessing Redis cache:', error);
+      console.error('Error accessing Redis cache:', error);
     }
-
+  
     try {
-        const users = ["ap0209", "marybauman", "parmort", "bwc9876", "noah_lot", "cc976948"];
-        const leaderboard = [];
-
-        for (const user of users) {
-            try {
-                const response = await axios.get(`https://codeforces.com/api/user.info?handles=${user}`);
-                
-                if (!response.data || 
-                    response.data.status !== 'OK' ||
-                    !response.data.result ||
-                    !Array.isArray(response.data.result) ||
-                    response.data.result.length === 0) {
-                    leaderboard.push({ handle: user, rating: null, rank: 'N/A' });
-                    continue;
-                }
-
-                const userData = response.data.result[0];
-                leaderboard.push({
-                    handle: userData.handle || user,
-                    rating: userData.rating || null,
-                    rank: userData.rank || 'N/A'
-                });
-            } catch (error) {
-                console.error(`Error processing user ${user}:`, error.message);
-                leaderboard.push({ handle: user, rating: null, rank: 'N/A' });
-            }
+      // 🔁 Step 1: Get usernames from MongoDB
+      const usersFromDB = await User.find({}, 'codeforcesUsername');
+      const users = usersFromDB
+        .map(user => user.codeforcesUsername)
+        .filter(username => !!username); // Remove empty/null usernames
+  
+      const leaderboard = [];
+  
+      for (const user of users) {
+        try {
+          const response = await axios.get(`https://codeforces.com/api/user.info?handles=${user}`);
+  
+          if (
+            !response.data ||
+            response.data.status !== 'OK' ||
+            !response.data.result ||
+            !Array.isArray(response.data.result) ||
+            response.data.result.length === 0
+          ) {
+            leaderboard.push({ handle: user, rating: null, rank: 'N/A' });
+            continue;
+          }
+  
+          const userData = response.data.result[0];
+          leaderboard.push({
+            handle: userData.handle || user,
+            rating: userData.rating || null,
+            rank: userData.rank || 'N/A'
+          });
+        } catch (error) {
+          console.error(`Error processing user ${user}:`, error.message);
+          leaderboard.push({ handle: user, rating: null, rank: 'N/A' });
         }
-
-        await redisClient.setEx(cacheKey, 900, JSON.stringify(leaderboard));
-        console.log('Codeforces leaderboard data cached in Redis');
-        res.json(leaderboard);
+      }
+  
+      await redisClient.setEx(cacheKey, 900, JSON.stringify(leaderboard));
+      console.log('Codeforces leaderboard data cached in Redis');
+      res.json(leaderboard);
     } catch (error) {
-        console.error('Error fetching Codeforces leaderboard:', error);
-        res.status(500).json({ error: 'Failed to fetch leaderboard data' });
+      console.error('Error fetching Codeforces leaderboard:', error);
+      res.status(500).json({ error: 'Failed to fetch leaderboard data' });
     }
-});
+  });
+  
 
 // Leetcode leaderboard endpoint
 router.get('/leetcode-leaderboard', async (req, res) => {
