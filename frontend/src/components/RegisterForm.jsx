@@ -31,14 +31,14 @@ const RegisterForm = () => {
 
       const data = await res.json();
       if (res.ok) {
-        setMessage('✅ Successfully registered!');
+        setMessage('Successfully registered!');
         setFormData({ name: '', email: '', leetcodeUsername: '', codeforcesUsername: '' });
       } else {
         setMessage(`❌ ${data.message}`);
       }
     } catch (error) {
       console.error('Error submitting form:', error);
-      setMessage('❌ Something went wrong.');
+      setMessage('Something went wrong.');
     }
   };
 
