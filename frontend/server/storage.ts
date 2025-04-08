@@ -38,6 +38,7 @@ export class MemStorage implements IStorage {
       ...insertUser, 
       id,
       score: 0,
+      rank: null,
       problemsSolved: 0,
       lastActive: new Date(),
     };
