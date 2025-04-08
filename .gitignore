@@ -1,0 +1,12 @@
+# Node.js dependencies
+node_modules/
+
+# Docker-related files
+docker-compose.override.yml
+docker-volume-data/
+*.log
+
+
+# System files
+.DS_Store
+Thumbs.db

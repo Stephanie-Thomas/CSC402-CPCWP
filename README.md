@@ -15,3 +15,7 @@ Connor Hill
 Tobias Bussiek
 Tristan Braun
 Stephanie Thomas
+
+# Usage
+run docker compose up --build
+then, access the frontend on localhost:3001
