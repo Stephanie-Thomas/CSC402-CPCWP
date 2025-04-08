@@ -1,3 +1,4 @@
+// src/pages/VerticalDisplay.tsx
 import { Navbar } from "@/components/navbar";
 import { Leaderboard } from "@/components/leaderboard";
 import { useQuery } from "@tanstack/react-query";
@@ -22,12 +23,9 @@ type LeetCodeUser = {
 function LeaderboardSkeleton() {
   return (
     <div className="space-y-3">
-      {/* Header skeleton */}
       <div className="pb-2">
         <Skeleton className="h-6 w-40 mx-auto" />
       </div>
-      
-      {/* Items skeleton */}
       {[...Array(5)].map((_, i) => (
         <div 
           key={i} 
@@ -47,16 +45,28 @@ function LeaderboardSkeleton() {
 }
 
 export default function VerticalDisplay() {
-  // Fetch Codeforces data
+  // Fetch Codeforces data.
   const { data: codeforcesData, isLoading: isLoadingCF, error: cfError } =
     useQuery<CodeforcesUser[]>({
       queryKey: ["/api/codeforces-leaderboard"],
+      queryFn: async () => {
+        const res = await fetch("/api/codeforces-leaderboard");
+        if (!res.ok) throw new Error("Failed to fetch Codeforces leaderboard");
+        return res.json();
+      },
+      refetchInterval: 30000,
     });
 
-  // Fetch LeetCode data
+  // Fetch LeetCode data.
   const { data: leetcodeData, isLoading: isLoadingLC, error: lcError } =
     useQuery<LeetCodeUser[]>({
       queryKey: ["/api/leetcode-leaderboard"],
+      queryFn: async () => {
+        const res = await fetch("/api/leetcode-leaderboard");
+        if (!res.ok) throw new Error("Failed to fetch LeetCode leaderboard");
+        return res.json();
+      },
+      refetchInterval: 30000,
     });
 
   const renderError = (message: string) => (
@@ -69,9 +79,8 @@ export default function VerticalDisplay() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950">
       <Navbar />
-      
       <main className="container mx-auto p-4 min-h-[calc(100vh-4rem)]">
-        {/* Decorative elements */}
+        {/* Decorative background elements */}
         <div className="absolute -z-10 top-24 -left-24 w-72 h-72 bg-primary/5 rounded-full"></div>
         <div className="absolute -z-10 top-36 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
         <div className="absolute -z-10 bottom-24 left-1/3 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
@@ -84,7 +93,6 @@ export default function VerticalDisplay() {
                 <h2 className="text-lg font-bold text-gray-800 dark:text-white">Codeforces</h2>
               </div>
             </div>
-            
             {cfError ? (
               renderError("Failed to load Codeforces leaderboard")
             ) : isLoadingCF ? (
@@ -110,7 +118,6 @@ export default function VerticalDisplay() {
                 <h2 className="text-lg font-bold text-gray-800 dark:text-white">LeetCode</h2>
               </div>
             </div>
-            
             {lcError ? (
               renderError("Failed to load LeetCode leaderboard")
             ) : isLoadingLC ? (
@@ -130,8 +137,6 @@ export default function VerticalDisplay() {
           </div>
         </div>
       </main>
-      
-      {/* Footer */}
       <footer className="border-t border-gray-200 dark:border-gray-800 py-6 bg-white dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center">

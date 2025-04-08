@@ -1,4 +1,3 @@
-// backend/routes/api.js
 const express = require('express');
 const axios = require('axios');
 const redisClient = require('../redisClient');

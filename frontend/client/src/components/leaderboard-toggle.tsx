@@ -26,7 +26,6 @@ function LeaderboardSkeleton() {
       <div className="pb-2">
         <Skeleton className="h-6 w-40 mx-auto" />
       </div>
-      
       {/* Items skeleton */}
       {[...Array(5)].map((_, i) => (
         <div 
@@ -47,19 +46,35 @@ function LeaderboardSkeleton() {
 }
 
 export function LeaderboardToggle() {
-  // Fetch Codeforces data
+  // Fetch Codeforces data with an explicit queryFn and live refetch interval.
   const { data: codeforcesData, isLoading: isLoadingCF, error: cfError } =
     useQuery<CodeforcesUser[]>({
       queryKey: ["/api/codeforces-leaderboard"],
+      queryFn: async () => {
+        const res = await fetch("/api/codeforces-leaderboard");
+        if (!res.ok) {
+          throw new Error("Failed to fetch Codeforces leaderboard");
+        }
+        return res.json();
+      },
+      refetchInterval: 30000, // refetch every 30 seconds
     });
 
-  // Fetch LeetCode data
+  // Fetch LeetCode data similarly.
   const { data: leetcodeData, isLoading: isLoadingLC, error: lcError } =
     useQuery<LeetCodeUser[]>({
       queryKey: ["/api/leetcode-leaderboard"],
+      queryFn: async () => {
+        const res = await fetch("/api/leetcode-leaderboard");
+        if (!res.ok) {
+          throw new Error("Failed to fetch LeetCode leaderboard");
+        }
+        return res.json();
+      },
+      refetchInterval: 30000,
     });
-  
-  // Track the active tab
+
+  // Track the active tab.
   const [activeTab, setActiveTab] = useState<"codeforces" | "leetcode">("codeforces");
 
   const renderError = (message: string) => (
@@ -69,17 +84,15 @@ export function LeaderboardToggle() {
     </Alert>
   );
 
-  // Custom tab content rendering
+  // Render the leaderboard for the selected tab.
   const renderTabContent = () => {
     if (activeTab === "codeforces") {
       if (cfError) {
         return renderError("Failed to load Codeforces leaderboard");
       }
-      
       if (isLoadingCF) {
         return <LeaderboardSkeleton />;
       }
-      
       return (
         <Leaderboard
           title="Codeforces"
@@ -96,11 +109,9 @@ export function LeaderboardToggle() {
       if (lcError) {
         return renderError("Failed to load LeetCode leaderboard");
       }
-      
       if (isLoadingLC) {
         return <LeaderboardSkeleton />;
       }
-      
       return (
         <Leaderboard
           title="LeetCode"
@@ -147,13 +158,11 @@ export function LeaderboardToggle() {
               </button>
             </div>
           </div>
-          
           {/* Decorative elements */}
           <div className="absolute -z-10 top-1/2 -translate-y-1/2 left-8 w-16 h-16 bg-primary/5 rounded-full blur-sm"></div>
           <div className="absolute -z-10 top-1/2 -translate-y-1/2 right-8 w-16 h-16 bg-primary/5 rounded-full blur-sm"></div>
         </div>
       </div>
-      
       <div className="mt-6 px-4">
         {renderTabContent()}
       </div>

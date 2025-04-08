@@ -1,14 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Trophy, Medal, Star, Award, Clock, Code, BookOpen, Bookmark, Terminal } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
+import { Card, CardContent } from "@/components/ui/card";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Badge } from "@/components/ui/badge";
+import { Trophy, Medal, BookOpen } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface LeaderboardProps {
   title: string;
@@ -37,52 +31,17 @@ function getRankIcon(index: number) {
     case 2:
       return <Medal className="h-6 w-6 text-amber-600" />;
     default:
-      return null;
-  }
-}
-
-function LeaderboardSkeleton() {
-  return (
-    <div className="space-y-3">
-      {/* Header skeleton */}
-      <div className="pb-2">
-        <Skeleton className="h-6 w-40 mx-auto" />
-      </div>
-      
-      {/* Items skeleton */}
-      {[...Array(5)].map((_, i) => (
-        <div 
-          key={i} 
-          className="flex items-center gap-4 p-4 rounded-lg border border-gray-100 shadow-sm animate-pulse"
-        >
-          <Skeleton className="h-7 w-7 rounded-full" />
-          <Skeleton className="h-7 w-7 rounded-full" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-3 w-24" />
-          </div>
-          <Skeleton className="h-5 w-16" />
+      return (
+        <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center shadow-sm">
+          <span className="text-sm font-bold text-gray-600 dark:text-gray-300">
+            {index + 1}
+          </span>
         </div>
-      ))}
-    </div>
-  );
+      );
+  }
 }
 
 export function Leaderboard({ title, users }: LeaderboardProps) {
-  if (!users) {
-    return null;
-  }
-
-  // Highlight colors for ranks
-  const getRankColor = (rank: string) => {
-    const lowerRank = rank.toLowerCase();
-    if (lowerRank.includes('expert') || lowerRank.includes('master')) return 'text-purple-600';
-    if (lowerRank.includes('specialist')) return 'text-blue-600';
-    if (lowerRank.includes('pupil')) return 'text-green-600';
-    if (lowerRank.includes('newbie')) return 'text-gray-600';
-    return 'text-gray-600';
-  };
-
   return (
     <Card className="w-full max-w-2xl mx-auto border border-gray-100 dark:border-gray-700 shadow-md overflow-hidden bg-white dark:bg-gray-800">
       <CardContent className="pt-5 pb-4 px-4 bg-white dark:bg-gray-800">
@@ -94,13 +53,8 @@ export function Leaderboard({ title, users }: LeaderboardProps) {
                   className="flex items-center gap-4 rounded-xl border p-4 transition-all cursor-pointer hover:shadow-md border-gray-100 dark:border-gray-700 hover:border-primary/20 bg-white dark:bg-gray-800"
                 >
                   <div className="flex h-9 w-9 items-center justify-center">
-                    {getRankIcon(index) || (
-                      <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center shadow-sm">
-                        <span className="text-sm font-bold text-gray-600 dark:text-gray-300">{index + 1}</span>
-                      </div>
-                    )}
+                    {getRankIcon(index)}
                   </div>
-                  
                   <div className="flex-1">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-1">
                       <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate hover:text-primary transition-colors">
@@ -108,7 +62,7 @@ export function Leaderboard({ title, users }: LeaderboardProps) {
                       </p>
                       <Badge 
                         variant="outline" 
-                        className={`hidden xs:inline-flex text-[10px] py-0 h-4 px-1.5 ${getRankColor(user.rank)}`}
+                        className="hidden xs:inline-flex text-[10px] py-0 h-4 px-1.5"
                       >
                         {user.rank}
                       </Badge>
@@ -121,14 +75,12 @@ export function Leaderboard({ title, users }: LeaderboardProps) {
                       )}
                     </p>
                   </div>
-                  
                   <div className="text-right">
                     <div className="text-sm font-bold text-gray-900 dark:text-gray-100">{user.score}</div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">points</div>
                   </div>
                 </div>
               </HoverCardTrigger>
-              
               <HoverCardContent 
                 align="center"
                 sideOffset={5}
