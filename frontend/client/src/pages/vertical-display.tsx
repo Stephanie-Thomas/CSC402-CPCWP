@@ -1,4 +1,3 @@
-// src/pages/VerticalDisplay.tsx
 import { Navbar } from "@/components/navbar";
 import { Leaderboard } from "@/components/leaderboard";
 import { useQuery } from "@tanstack/react-query";
@@ -93,7 +92,6 @@ export default function VerticalDisplay() {
   // - Map contestRanking to `score` (using 0 when not available)
   // - Include contest info from contestTitle
   // - Sort in ascending order so that lower places come first
-  //   (with entries having score 0 moved to the bottom)
   const processedLeetCode =
     leetcodeData?.map((user) => ({
       id: user.username,
