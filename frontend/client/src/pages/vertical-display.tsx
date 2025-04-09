@@ -27,8 +27,8 @@ function LeaderboardSkeleton() {
         <Skeleton className="h-6 w-40 mx-auto" />
       </div>
       {[...Array(5)].map((_, i) => (
-        <div 
-          key={i} 
+        <div
+          key={i}
           className="flex items-center gap-4 p-4 rounded-lg border border-gray-100 dark:border-gray-700 shadow-sm animate-pulse"
         >
           <Skeleton className="h-7 w-7 rounded-full" />
@@ -70,11 +70,44 @@ export default function VerticalDisplay() {
     });
 
   const renderError = (message: string) => (
-    <Alert variant="destructive" className="mx-auto max-w-2xl border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800">
+    <Alert
+      variant="destructive"
+      className="mx-auto max-w-2xl border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800"
+    >
       <AlertCircle className="h-4 w-4" />
       <AlertDescription className="text-center">{message}</AlertDescription>
     </Alert>
   );
+
+  // Process and sort Codeforces data descending by rating (score).
+  const processedCodeforces =
+    codeforcesData?.map((user) => ({
+      id: user.handle,
+      username: user.handle,
+      score: user.rating || 0,
+      rank: user.rank,
+      problemsSolved: 0,
+    }))?.sort((a, b) => b.score - a.score) || [];
+
+  // Process LeetCode data:
+  // - Map contestRanking to `score` (using 0 when not available)
+  // - Include contest info from contestTitle
+  // - Sort in ascending order so that lower places come first
+  //   (with entries having score 0 moved to the bottom)
+  const processedLeetCode =
+    leetcodeData?.map((user) => ({
+      id: user.username,
+      username: user.username,
+      score: parseInt(user.contestRanking) || 0,
+      rank: user.overallRanking,
+      problemsSolved: user.totalSolved,
+      contest: user.contestTitle,
+    }))?.sort((a, b) => {
+      if (a.score === 0 && b.score === 0) return 0;
+      if (a.score === 0) return 1;
+      if (b.score === 0) return -1;
+      return a.score - b.score;
+    }) || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950">
@@ -84,13 +117,15 @@ export default function VerticalDisplay() {
         <div className="absolute -z-10 top-24 -left-24 w-72 h-72 bg-primary/5 rounded-full"></div>
         <div className="absolute -z-10 top-36 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
         <div className="absolute -z-10 bottom-24 left-1/3 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
           <div className="flex flex-col">
             <div className="flex items-center justify-center gap-2 mb-6">
               <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-5 py-2.5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                 <Terminal className="h-5 w-5 text-primary" />
-                <h2 className="text-lg font-bold text-gray-800 dark:text-white">Codeforces</h2>
+                <h2 className="text-lg font-bold text-gray-800 dark:text-white">
+                  Codeforces
+                </h2>
               </div>
             </div>
             {cfError ? (
@@ -98,24 +133,17 @@ export default function VerticalDisplay() {
             ) : isLoadingCF ? (
               <LeaderboardSkeleton />
             ) : (
-              <Leaderboard
-                title="Codeforces"
-                users={(codeforcesData || []).map((user) => ({
-                  id: user.handle,
-                  username: user.handle,
-                  score: user.rating || 0,
-                  rank: user.rank,
-                  problemsSolved: 0,
-                }))}
-              />
+              <Leaderboard title="Codeforces" users={processedCodeforces} />
             )}
           </div>
-          
+
           <div className="flex flex-col">
             <div className="flex items-center justify-center gap-2 mb-6">
               <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-5 py-2.5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                 <Code className="h-5 w-5 text-primary" />
-                <h2 className="text-lg font-bold text-gray-800 dark:text-white">LeetCode</h2>
+                <h2 className="text-lg font-bold text-gray-800 dark:text-white">
+                  LeetCode
+                </h2>
               </div>
             </div>
             {lcError ? (
@@ -123,16 +151,7 @@ export default function VerticalDisplay() {
             ) : isLoadingLC ? (
               <LeaderboardSkeleton />
             ) : (
-              <Leaderboard
-                title="LeetCode"
-                users={(leetcodeData || []).map((user) => ({
-                  id: user.username,
-                  username: user.username,
-                  score: parseInt(user.contestRanking) || 0,
-                  rank: user.overallRanking,
-                  problemsSolved: user.totalSolved,
-                }))}
-              />
+              <Leaderboard title="LeetCode" users={processedLeetCode} />
             )}
           </div>
         </div>

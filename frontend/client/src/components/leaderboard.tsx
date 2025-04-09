@@ -4,15 +4,19 @@ import { Badge } from "@/components/ui/badge";
 import { Trophy, Medal, BookOpen } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
+interface LeaderboardUser {
+  id: string;
+  username: string;
+  score: number;
+  rank: string;
+  problemsSolved: number;
+  /** Only available for LeetCode users */
+  contest?: string | null;
+}
+
 interface LeaderboardProps {
   title: string;
-  users: {
-    id: string;
-    username: string;
-    score: number;
-    rank: string;
-    problemsSolved: number;
-  }[];
+  users: LeaderboardUser[];
 }
 
 function getRankIcon(index: number) {
@@ -45,6 +49,14 @@ export function Leaderboard({ title, users }: LeaderboardProps) {
   return (
     <Card className="w-full max-w-2xl mx-auto border border-gray-100 dark:border-gray-700 shadow-md overflow-hidden bg-white dark:bg-gray-800">
       <CardContent className="pt-5 pb-4 px-4 bg-white dark:bg-gray-800">
+        {/* For LeetCode, display the contest info at the top */}
+        {title === "LeetCode" && users.length > 0 && (
+          <div className="mb-4 text-center">
+            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              {users[0].contest ? users[0].contest : "N/A"}
+            </p>
+          </div>
+        )}
         <div className="space-y-3">
           {users.map((user, index) => (
             <HoverCard key={user.id}>
@@ -67,18 +79,31 @@ export function Leaderboard({ title, users }: LeaderboardProps) {
                         {user.rank}
                       </Badge>
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                      {title === "LeetCode" ? (
-                        <>{user.problemsSolved} problems solved</>
-                      ) : (
-                        <>Rating: {user.score}</>
-                      )}
-                    </p>
+                    {title === "LeetCode" ? (
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        {user.problemsSolved} problems solved
+                      </p>
+                    ) : (
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        Rating: {user.score}
+                      </p>
+                    )}
                   </div>
-                  <div className="text-right">
-                    <div className="text-sm font-bold text-gray-900 dark:text-gray-100">{user.score}</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">points</div>
-                  </div>
+                  {title === "LeetCode" ? (
+                    <div className="text-right">
+                      <div className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                        {user.score !== 0 ? `#${user.score}` : "N/A"}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">Place</div>
+                    </div>
+                  ) : (
+                    <div className="text-right">
+                      <div className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                        {user.score}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">points</div>
+                    </div>
+                  )}
                 </div>
               </HoverCardTrigger>
               <HoverCardContent 
@@ -88,10 +113,11 @@ export function Leaderboard({ title, users }: LeaderboardProps) {
               >
                 <div className="p-4 bg-white dark:bg-gray-800">
                   <a 
-                    href={title === "Codeforces" 
-                      ? `https://codeforces.com/profile/${user.username}`
-                      : `https://leetcode.com/${user.username}`
-                    } 
+                    href={
+                      title === "Codeforces" 
+                        ? `https://codeforces.com/profile/${user.username}`
+                        : `https://leetcode.com/${user.username}`
+                    }
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 p-2 rounded-lg text-primary hover:bg-primary/5 dark:hover:bg-primary/20 transition-colors font-medium text-sm"
