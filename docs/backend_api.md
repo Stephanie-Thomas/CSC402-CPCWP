@@ -27,7 +27,7 @@ This documentation explains how to test and use the backend API endpoints during
 
 ### 3. User Registration Endpoint
 - **Method:** POST  
-- **URL:** `/register`  
+- **URL:** `/api/register`  
 - **Description:**  
   Registers a new user. Expects a JSON payload with the fields: `name`, `email`, `leetcodeUsername`, and `codeforcesUsername`. The endpoint validates required fields and checks for unique email addresses.
 - **Test with Postman:**  
