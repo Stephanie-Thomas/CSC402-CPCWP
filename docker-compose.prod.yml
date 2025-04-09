@@ -1,0 +1,43 @@
+services:
+  leetcode_api:
+    build:
+      context: ./leetcode-api
+      dockerfile: Dockerfile.prod
+    container_name: leetcode_api
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: frontend
+    ports:
+      - "3001:3001"  # Only the frontend is exposed externally
+    restart: always
+    environment:
+      - NODE_ENV=production
+
+  backend-node:
+    build:
+      context: ./backend-node
+      dockerfile: Dockerfile.prod
+    container_name: backend-node
+    restart: always
+    depends_on:
+      - redis
+      - leetcode_api
+    environment:
+      - NODE_ENV=production
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MONGO_URI=${MONGO_URI}
+    env_file:
+      - .env
+    
+  redis:
+    image: redis:alpine
+    container_name: redis
