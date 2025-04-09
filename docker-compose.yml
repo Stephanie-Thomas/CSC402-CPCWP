@@ -2,7 +2,7 @@ services:
   leetcode_api:
     build:
       context: ./leetcode-api
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: leetcode-api
     ports:
       - "3000:3000"
@@ -18,7 +18,9 @@ services:
       - /usr/src/app/node_modules
     
   frontend:
-    build: ./frontend
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile.dev
     container_name: frontend
     ports:
       - "3001:3001"
@@ -34,7 +36,7 @@ services:
   backend-node:
     build:
       context: ./backend-node
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: backend-node
     ports: 
       - "4000:4000"
