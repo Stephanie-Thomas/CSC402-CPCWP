@@ -54,7 +54,7 @@ export function LeaderboardToggle() {
     useQuery<CodeforcesUser[]>({
       queryKey: ["/api/codeforces-leaderboard"],
       queryFn: async () => {
-        const res = await fetch(`${API_BASE_URL}/api/codeforces-leaderboard`);
+        const res = await fetch(`${API_BASE_URL}api/codeforces-leaderboard`);
         if (!res.ok) {
           throw new Error("Failed to fetch Codeforces leaderboard");
         }
@@ -68,7 +68,7 @@ export function LeaderboardToggle() {
     useQuery<LeetCodeUser[]>({
       queryKey: ["/api/leetcode-leaderboard"],
       queryFn: async () => {
-        const res = await fetch(`${API_BASE_URL}/api/leetcode-leaderboard`);
+        const res = await fetch(`${API_BASE_URL}api/leetcode-leaderboard`);
         if (!res.ok) {
           throw new Error("Failed to fetch LeetCode leaderboard");
         }
