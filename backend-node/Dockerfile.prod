@@ -1,0 +1,19 @@
+# --- Stage 1: Build ---
+    FROM node:20-alpine AS build
+    WORKDIR /usr/src/app
+    COPY package*.json ./
+    RUN npm install
+    COPY . .
+    
+    # --- Stage 2: Production ---
+    FROM node:20-alpine
+    WORKDIR /usr/src/app
+    COPY package*.json ./
+    # Install only production dependencies
+    RUN npm install --production
+    # Copy the built artifacts or entire application as needed
+    COPY --from=build /usr/src/app .
+    # Expose the service port (4000 in your example)
+    EXPOSE 4000
+    CMD ["npm", "start"]
+    
