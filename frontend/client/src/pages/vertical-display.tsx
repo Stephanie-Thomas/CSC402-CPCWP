@@ -5,6 +5,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Code, Terminal, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+
 type CodeforcesUser = {
   handle: string;
   rating: number | null;
@@ -49,7 +51,7 @@ export default function VerticalDisplay() {
     useQuery<CodeforcesUser[]>({
       queryKey: ["/api/codeforces-leaderboard"],
       queryFn: async () => {
-        const res = await fetch("/api/codeforces-leaderboard");
+        const res = await fetch(`${API_BASE_URL}/api/codeforces-leaderboard`);
         if (!res.ok) throw new Error("Failed to fetch Codeforces leaderboard");
         return res.json();
       },
@@ -61,7 +63,7 @@ export default function VerticalDisplay() {
     useQuery<LeetCodeUser[]>({
       queryKey: ["/api/leetcode-leaderboard"],
       queryFn: async () => {
-        const res = await fetch("/api/leetcode-leaderboard");
+        const res = await fetch(`${API_BASE_URL}/api/leetcode-leaderboard`);
         if (!res.ok) throw new Error("Failed to fetch LeetCode leaderboard");
         return res.json();
       },
