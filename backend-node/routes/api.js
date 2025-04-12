@@ -165,6 +165,8 @@ router.get('/leetcode-leaderboard', async (req, res) => {
 });
 
 router.post('/register', async (req, res) => {
+  console.log('POST /register hit'); 
+  console.log(req.body); 
   try {
     const { name, email, leetcodeUsername, codeforcesUsername } = req.body;
 
