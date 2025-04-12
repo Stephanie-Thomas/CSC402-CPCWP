@@ -10,6 +10,8 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Code, Mail, ExternalLink } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
+import RegisterForm from "@/components/RegisterForm";
+
 
 export function Navbar() {
   const [email, setEmail] = useState("");
@@ -114,21 +116,10 @@ export function Navbar() {
                       <div className="space-y-2">
                         <h3 className="font-semibold text-lg text-center">Join Our Club</h3>
                         <p className="text-sm text-gray-500 text-center">
-                          Enter your email to sign up for the leaderboard
+                          Enter your info to sign up for the leaderboard
                         </p>
                       </div>
-                      <div className="space-y-3">
-                        <Input
-                          type="email"
-                          placeholder="your.name@wcu.edu"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className="h-10"
-                        />
-                        <Button className="w-full shadow-sm" onClick={handleSubmit}>
-                          Sign Up
-                        </Button>
-                      </div>
+                      <RegisterForm onSuccess={() => setIsSubmitted(true)} />
                       <div className="mt-4 pt-3 border-t text-sm text-center">
                         <span className="text-gray-500">WCU Alumni?</span>{" "}
                         <span 
@@ -140,7 +131,7 @@ export function Navbar() {
                       </div>
                     </div>
                   )}
-                </DropdownMenuContent>
+              </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </div>
