@@ -13,7 +13,7 @@
     RUN npm install --production
     # Copy the built artifacts or entire application as needed
     COPY --from=build /usr/src/app .
-    # Expose the service port (4000 in your example)
-    EXPOSE 4000
+    # Expose the service port (10000 for render)
+    EXPOSE 10000
     CMD ["npm", "start"]
     

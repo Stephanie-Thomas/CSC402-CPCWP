@@ -9,7 +9,7 @@ dotenv.config(); // Load environment variables
 const apiRoutes = require('./routes/api.js');
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 10000;
 
 //Connect to MongoDB Atlas
 mongoose.connect(process.env.MONGO_URI, {
