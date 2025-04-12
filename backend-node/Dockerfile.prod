@@ -10,7 +10,7 @@
     WORKDIR /usr/src/app
     COPY package*.json ./
     # Install only production dependencies
-    RUN npm install --production
+    RUN npm install 
     # Copy the built artifacts or entire application as needed
     COPY --from=build /usr/src/app .
     # Expose the service port (10000 for render)
