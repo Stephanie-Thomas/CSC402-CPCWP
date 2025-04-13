@@ -21,7 +21,7 @@ router.get('/codeforces-leaderboard', async (req, res) => {
     }
   
     try {
-      // 🔁 Step 1: Get usernames from MongoDB
+      // Step 1: Get usernames from MongoDB
       const usersFromDB = await User.find({}, 'codeforcesUsername');
       const users = usersFromDB
         .map(user => user.codeforcesUsername)
@@ -165,32 +165,38 @@ router.get('/leetcode-leaderboard', async (req, res) => {
 });
 
 router.get('/test-log', (req, res) => {
-  console.log('✅ /api/test-log endpoint hit');
+  console.log('/api/test-log endpoint hit');
   res.send('Test log hit!');
 });
 
 router.post('/register', async (req, res) => {
   try {
-    console.log("🔔 /register route hit");
+    console.log("/register route hit");
 
     // Sanity check if body was parsed
     if (!req.body || typeof req.body !== 'object') {
-      console.error("❌ req.body is not defined or invalid");
+      console.error("req.body is not defined or invalid");
       return res.status(400).json({ message: "Invalid request body" });
     }
 
-    console.log("📦 Request body:", req.body);
+    console.log("Request body:", req.body);
 
     const { name, email, leetcodeUsername, codeforcesUsername } = req.body;
 
     if (!name || !email || !leetcodeUsername || !codeforcesUsername) {
-      console.error("❌ Missing required fields");
+      console.error("Missing required fields");
       return res.status(400).json({ message: "All fields are required." });
     }
 
+    // Enforce @wcupa.edu email domain
+    if (!email.toLowerCase().endsWith("@wcupa.edu")) {
+      return res.status(400).json({ message: "Only @wcupa.edu emails are allowed." });
+    }
+
+
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
-      console.warn("⚠️ Duplicate email:", email);
+      console.warn("Duplicate email:", email);
       return res.status(400).json({ message: "Email already in use." });
     }
 
@@ -202,11 +208,11 @@ router.post('/register', async (req, res) => {
     });
 
     await newUser.save();
-    console.log("✅ User saved to DB:", newUser.email);
+    console.log("User saved to DB:", newUser.email);
     return res.status(201).json({ message: "Successfully registered." });
 
   } catch (error) {
-    console.error("🔥 Error in /register route:", error);
+    console.error("Error in /register route:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 });
