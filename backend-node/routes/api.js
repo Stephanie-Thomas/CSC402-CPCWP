@@ -150,6 +150,10 @@ router.post('/register', async (req, res) => {
 
     const newUser = new User({ name, email, leetcodeUsername, codeforcesUsername });
     await newUser.save();
+    // Clear leaderboard cache
+    await redisClient.del('Codeforcesleaderboard');
+    await redisClient.del('leetcodeLeaderboard');
+    
     return res.status(201).json({ message: "Successfully registered." });
 
   } catch (error) {
