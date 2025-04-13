@@ -15,5 +15,5 @@
     COPY --from=build /usr/src/app .
     # Expose the service port (10000 for render)
     EXPOSE 10000
-    CMD ["npm", "start"]
+    CMD ["node", "server.js"]
     
