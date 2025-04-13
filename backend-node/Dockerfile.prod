@@ -12,8 +12,8 @@
     # Install only production dependencies
     RUN npm install --production
     # Copy the built artifacts or entire application as needed
-    COPY --from=build /usr/src/app .
+    COPY . .
     # Expose the service port (10000 for render)
     EXPOSE 10000
-    CMD ["npm", "start"]
+    CMD ["npm", "server.js"]
     
