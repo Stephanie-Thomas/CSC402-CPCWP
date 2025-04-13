@@ -164,11 +164,6 @@ router.get('/leetcode-leaderboard', async (req, res) => {
     }
 });
 
-router.get('/test-log', (req, res) => {
-  console.log('/api/test-log endpoint hit');
-  res.send('Test log hit!');
-});
-
 router.post('/register', async (req, res) => {
   try {
     console.log("/register route hit");
