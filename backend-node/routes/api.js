@@ -165,36 +165,45 @@ router.get('/leetcode-leaderboard', async (req, res) => {
 });
 
 router.post('/register', async (req, res) => {
-  console.log('POST /register hit'); 
-  console.log(req.body); 
   try {
+    console.log("🔔 /register route hit");
+
+    // Sanity check if body was parsed
+    if (!req.body || typeof req.body !== 'object') {
+      console.error("❌ req.body is not defined or invalid");
+      return res.status(400).json({ message: "Invalid request body" });
+    }
+
+    console.log("📦 Request body:", req.body);
+
     const { name, email, leetcodeUsername, codeforcesUsername } = req.body;
 
-    // Check for required fields
     if (!name || !email || !leetcodeUsername || !codeforcesUsername) {
+      console.error("❌ Missing required fields");
       return res.status(400).json({ message: "All fields are required." });
     }
 
-    // Check if email is already registered
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
+      console.warn("⚠️ Duplicate email:", email);
       return res.status(400).json({ message: "Email already in use." });
     }
 
-    // Create and save the new user
     const newUser = new User({
       name,
       email,
       leetcodeUsername,
-      codeforcesUsername
+      codeforcesUsername,
     });
 
     await newUser.save();
+    console.log("✅ User saved to DB:", newUser.email);
     return res.status(201).json({ message: "Successfully registered." });
 
   } catch (error) {
-    console.error("Error during registration:", error);
+    console.error("🔥 Error in /register route:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
 module.exports = router;

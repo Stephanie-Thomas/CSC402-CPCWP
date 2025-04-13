@@ -32,3 +32,6 @@ mongoose.connect(process.env.MONGO_URI, {
 app.use(cors({ origin: 'https://csc402-cpcwp.onrender.com' })); // Allow frontend origin
 app.use(express.json());
 app.use('/api', apiRoutes);
+
+console.log("📁 Starting backend...");
+console.log("🌐 MONGO_URI:", process.env.MONGO_URI || "❌ Not defined");
