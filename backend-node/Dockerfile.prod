@@ -11,10 +11,9 @@
     
     COPY package*.json ./
     RUN npm install --production
-    
-    # Only copy the backend build output (not frontend or root files)
-    COPY . .
-    
+    # Copy the built artifacts or entire application as needed
+    COPY --from=build /usr/src/app .
+    # Expose the service port (10000 for render)
     EXPOSE 10000
-    CMD ["node", "server.js"]
-            
+    CMD ["npm", "start"]
+    
