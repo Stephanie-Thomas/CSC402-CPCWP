@@ -1,6 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,17 +11,10 @@ import { Code, Mail, ExternalLink } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 import RegisterForm from "@/components/RegisterForm";
 
-
 export function Navbar() {
-  const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [location] = useLocation();
   const isDisplayPage = location === "/display";
-
-  const handleSubmit = () => {
-    console.log("Email submitted:", email);
-    setIsSubmitted(true);
-  };
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b shadow-sm bg-primary backdrop-blur supports-[backdrop-filter]:bg-primary/90">
@@ -74,22 +66,31 @@ export function Navbar() {
 
             <div className="flex items-center gap-3">
               <ThemeToggle />
-              <a href="https://ramconnect.wcupa.edu/cpc/home/" target="_blank" rel="noopener noreferrer" className="hidden md:flex">
-                <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 hover:text-white">
+              <a
+                href="https://ramconnect.wcupa.edu/cpc/home/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden md:flex"
+              >
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-white hover:bg-white/20 hover:text-white"
+                >
                   <ExternalLink className="h-5 w-5" />
                 </Button>
               </a>
               <Link href="/display">
-                <Button variant="secondary" className="shadow-sm bg-white/90 hover:bg-white text-primary font-medium">
+                <Button
+                  variant="secondary"
+                  className="shadow-sm bg-white/90 hover:bg-white text-primary font-medium"
+                >
                   Display View
                 </Button>
               </Link>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="default"
-                    className="shadow-sm font-medium flex gap-2"
-                  >
+                  <Button variant="default" className="shadow-sm font-medium flex gap-2">
                     <Mail className="h-4 w-4" />
                     Join Us
                   </Button>
@@ -99,14 +100,18 @@ export function Navbar() {
                     <div className="space-y-3 py-2">
                       <div className="flex justify-center">
                         <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-8 w-8 text-green-500"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
                         </div>
                       </div>
-                      <p className="text-center text-green-600 font-medium">
-                        Thanks for signing up!
-                      </p>
+                      <p className="text-center text-green-600 font-medium">Thanks for signing up!</p>
                       <p className="text-center text-sm text-gray-500">
                         You'll receive an email with next steps shortly.
                       </p>
@@ -122,8 +127,8 @@ export function Navbar() {
                       <RegisterForm onSuccess={() => setIsSubmitted(true)} />
                       <div className="mt-4 pt-3 border-t text-sm text-center">
                         <span className="text-gray-500">WCU Alumni?</span>{" "}
-                        <span 
-                          onClick={() => window.location.href="/"} 
+                        <span
+                          onClick={() => window.location.href = "/"}
                           className="text-primary font-medium hover:underline transition-all cursor-pointer"
                         >
                           Join here
@@ -131,7 +136,7 @@ export function Navbar() {
                       </div>
                     </div>
                   )}
-              </DropdownMenuContent>
+                </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </div>

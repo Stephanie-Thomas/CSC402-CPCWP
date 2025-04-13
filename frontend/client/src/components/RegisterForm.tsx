@@ -22,6 +22,7 @@ export default function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
     try {
       const res = await fetch(`${API_BASE}api/register`, {
         method: "POST",
@@ -33,10 +34,10 @@ export default function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
       if (res.ok) {
         onSuccess();
       } else {
-        setError(data.message || "Failed to register");
+        setError(data.message || "Failed to register.");
       }
-    } catch (err) {
-      setError("Network error. Try again later.");
+    } catch {
+      setError("Network error. Please try again later.");
     }
   };
 
@@ -71,7 +72,7 @@ export default function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
         onChange={handleChange}
         required
       />
-      {error && <p className="text-sm text-red-500"> {error}</p>}
+      {error && <p className="text-sm text-red-500">{error}</p>}
       <Button type="submit" className="w-full">
         Submit
       </Button>

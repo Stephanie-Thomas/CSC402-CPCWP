@@ -11,27 +11,21 @@ const apiRoutes = require('./routes/api.js');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-//Connect to MongoDB Atlas
+// Connect to MongoDB Atlas
 mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 })
 .then(() => {
-    console.log("Connected to MongoDB Atlas");
-
-    // Start the server only after successful DB connection
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-    });
+  app.listen(PORT, () => {
+    console.log(`✅ Backend server running on port ${PORT}`);
+  });
 })
 .catch((err) => {
-    console.error("MongoDB Connection Error:", err);
+  console.error("❌ MongoDB Connection Error:", err);
 });
 
 // Middleware
-app.use(cors({ origin: 'https://csc402-cpcwp.onrender.com' })); // Allow frontend origin
+app.use(cors({ origin: 'https://csc402-cpcwp.onrender.com' }));
 app.use(express.json());
 app.use('/api', apiRoutes);
-
-console.log("📁 Starting backend...");
-console.log("🌐 MONGO_URI:", process.env.MONGO_URI || "❌ Not defined");
