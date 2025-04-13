@@ -3,6 +3,8 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 export default function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
   const [formData, setFormData] = useState({
     name: "",
@@ -21,7 +23,7 @@ export default function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
     e.preventDefault();
     setError("");
     try {
-      const res = await fetch("https://csc402-cpcwp.onrender.com/api/register", {
+      const res = await fetch(`${API_BASE}/api/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
