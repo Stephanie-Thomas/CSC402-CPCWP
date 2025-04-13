@@ -40,7 +40,7 @@ router.get('/codeforces-leaderboard', async (req, res) => {
       }
     }
 
-    await redisClient.setEx(cacheKey, 10, JSON.stringify(leaderboard));
+    await redisClient.setEx(cacheKey, 900, JSON.stringify(leaderboard));
     res.json(leaderboard);
   } catch (error) {
     console.error('Codeforces fetch error:', error);
@@ -62,7 +62,13 @@ router.get('/leetcode-leaderboard', async (req, res) => {
   }
 
   try {
-    const users = ["kmatotek", "linhbngo"];
+
+    const usersFromDB = await User.find({}, 'leetcodeUsername');
+    const users = usersFromDB
+      .map(user => user.leetcodeUsername)
+      .filter(Boolean);
+
+
     const profileDataMap = new Map();
     const contestHistoryMap = new Map();
 
