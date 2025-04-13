@@ -40,7 +40,7 @@ router.get('/codeforces-leaderboard', async (req, res) => {
       }
     }
 
-    await redisClient.setEx(cacheKey, 900, JSON.stringify(leaderboard));
+    await redisClient.setEx(cacheKey, 10, JSON.stringify(leaderboard));
     res.json(leaderboard);
   } catch (error) {
     console.error('Codeforces fetch error:', error);

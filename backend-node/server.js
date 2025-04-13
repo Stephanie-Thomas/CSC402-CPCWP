@@ -29,3 +29,8 @@ mongoose.connect(process.env.MONGO_URI, {
 app.use(cors({ origin: 'https://csc402-cpcwp.onrender.com' }));
 app.use(express.json());
 app.use('/api', apiRoutes);
+
+setInterval(() => {
+    console.log("✅ Server is still running...");
+  }, 30000); // logs every 30 seconds
+  
