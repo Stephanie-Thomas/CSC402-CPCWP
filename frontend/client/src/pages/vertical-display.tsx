@@ -48,32 +48,27 @@ function LeaderboardSkeleton() {
 }
 
 export default function VerticalDisplay() {
-  const [timer, setTimer] = useState(() => {
-    const now = new Date();
-    const minutes = now.getMinutes();
-    const seconds = now.getSeconds();
-    const remainder = 30 - (minutes % 30);
-    return remainder * 60 - seconds;
-  });
+  const [timer, setTimer] = useState(0); // Just initialize to 0
 
-  // Timer countdown + ping backend at 60 seconds
+  // Timer countdown + ping backend at 120 seconds
   useEffect(() => {
-    const interval = setInterval(() => {
+    const updateTimer = () => {
       const now = new Date();
       const minutes = now.getMinutes();
       const seconds = now.getSeconds();
       const remainder = 30 - (minutes % 30);
       const newTimer = remainder * 60 - seconds;
-  
       setTimer(newTimer);
-  
+
       if (newTimer === 120) {
-        // Ping backend to spin it up before actual refresh
         fetch(`${API_BASE_URL}api/codeforces-leaderboard`);
         fetch(`${API_BASE_URL}api/leetcode-leaderboard`);
       }
-    }, 1000);
-  
+    };
+
+    updateTimer(); // Initialize immediately on mount
+    const interval = setInterval(updateTimer, 1000);
+
     return () => clearInterval(interval);
   }, []);
 
