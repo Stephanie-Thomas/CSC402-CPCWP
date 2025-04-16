@@ -1,5 +1,6 @@
+// src/pages/vertical-display.tsx
 import { useEffect, useState } from "react";
-import { useQuery, queryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Navbar } from "@/components/navbar";
 import { Leaderboard } from "@/components/leaderboard";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -47,39 +48,30 @@ function LeaderboardSkeleton() {
 }
 
 export default function VerticalDisplay() {
-  const [secondsLeft, setSecondsLeft] = useState(1800); // 30 minutes in seconds
+  const [timer, setTimer] = useState(1800); // 30 minutes in seconds
 
-  // Countdown timer
+  // Timer countdown + ping backend at 60 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      setSecondsLeft((prev) => (prev === 0 ? 1800 : prev - 1));
+      setTimer((prev) => {
+        const next = prev - 1;
+        if (next === 60) {
+          // Ping backend to warm it up
+          fetch(`${API_BASE_URL}api/codeforces-leaderboard`);
+          fetch(`${API_BASE_URL}api/leetcode-leaderboard`);
+        }
+        return next <= 0 ? 1800 : next;
+      });
     }, 1000);
+
     return () => clearInterval(interval);
   }, []);
 
-  // Trigger backend ping + refresh logic
-  useEffect(() => {
-    if (secondsLeft === 60) {
-      // Ping backend to warm it up
-      fetch(`${API_BASE_URL}api/codeforces-leaderboard`).catch(() => {});
-      fetch(`${API_BASE_URL}api/leetcode-leaderboard`).catch(() => {});
-    }
-    if (secondsLeft === 0) {
-      // Trigger backend refresh and refetch on frontend
-      fetch(`${API_BASE_URL}api/refresh-leaderboards`, { method: "POST" })
-        .then(() => {
-          queryClient.invalidateQueries({ queryKey: ["/api/codeforces-leaderboard"] });
-          queryClient.invalidateQueries({ queryKey: ["/api/leetcode-leaderboard"] });
-        })
-        .catch(() => {});
-    }
-  }, [secondsLeft]);
-
-  // Format seconds to mm:ss
-  const formatTime = (s: number) =>
-    `${Math.floor(s / 60)
-      .toString()
-      .padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
+  const formatTime = (seconds: number) => {
+    const min = Math.floor(seconds / 60).toString().padStart(2, "0");
+    const sec = (seconds % 60).toString().padStart(2, "0");
+    return `${min}:${sec}`;
+  };
 
   const { data: codeforcesData, isLoading: isLoadingCF, error: cfError } =
     useQuery<CodeforcesUser[]>({
@@ -89,7 +81,7 @@ export default function VerticalDisplay() {
         if (!res.ok) throw new Error("Failed to fetch Codeforces leaderboard");
         return res.json();
       },
-      refetchInterval: 30000,
+      refetchInterval: 1800000, // 30 minutes
     });
 
   const { data: leetcodeData, isLoading: isLoadingLC, error: lcError } =
@@ -100,7 +92,7 @@ export default function VerticalDisplay() {
         if (!res.ok) throw new Error("Failed to fetch LeetCode leaderboard");
         return res.json();
       },
-      refetchInterval: 30000,
+      refetchInterval: 1800000, // 30 minutes
     });
 
   const renderError = (message: string) => (
@@ -146,9 +138,8 @@ export default function VerticalDisplay() {
         <div className="absolute -z-10 top-36 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
         <div className="absolute -z-10 bottom-24 left-1/3 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
 
-        {/* Refresh timer */}
-        <div className="text-center text-sm text-gray-500 mb-4">
-          Refreshing in <strong>{formatTime(secondsLeft)}</strong>
+        <div className="text-center font-mono text-sm text-gray-600 dark:text-gray-400 mb-6">
+          Refreshing leaderboard in: <strong>{formatTime(timer)}</strong>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
