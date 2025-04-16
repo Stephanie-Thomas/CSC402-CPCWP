@@ -55,7 +55,7 @@ export default function VerticalDisplay() {
     const interval = setInterval(() => {
       setTimer((prev) => {
         const next = prev - 1;
-        if (next === 60) {
+        if (next === 120) {
           // Ping backend to warm it up
           fetch(`${API_BASE_URL}api/codeforces-leaderboard`);
           fetch(`${API_BASE_URL}api/leetcode-leaderboard`);
