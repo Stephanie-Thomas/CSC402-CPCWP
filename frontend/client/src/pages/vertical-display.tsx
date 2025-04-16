@@ -48,22 +48,32 @@ function LeaderboardSkeleton() {
 }
 
 export default function VerticalDisplay() {
-  const [timer, setTimer] = useState(1800); // 30 minutes in seconds
+  const [timer, setTimer] = useState(() => {
+    const now = new Date();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+    const remainder = 30 - (minutes % 30);
+    return remainder * 60 - seconds;
+  });
 
   // Timer countdown + ping backend at 60 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimer((prev) => {
-        const next = prev - 1;
-        if (next === 120) {
-          // Ping backend to warm it up
-          fetch(`${API_BASE_URL}api/codeforces-leaderboard`);
-          fetch(`${API_BASE_URL}api/leetcode-leaderboard`);
-        }
-        return next <= 0 ? 1800 : next;
-      });
+      const now = new Date();
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+      const remainder = 30 - (minutes % 30);
+      const newTimer = remainder * 60 - seconds;
+  
+      setTimer(newTimer);
+  
+      if (newTimer === 120) {
+        // Ping backend to spin it up before actual refresh
+        fetch(`${API_BASE_URL}api/codeforces-leaderboard`);
+        fetch(`${API_BASE_URL}api/leetcode-leaderboard`);
+      }
     }, 1000);
-
+  
     return () => clearInterval(interval);
   }, []);
 

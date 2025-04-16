@@ -131,7 +131,7 @@ router.get('/leetcode-leaderboard', async (req, res) => {
       return parseInt(a.contestRanking) - parseInt(b.contestRanking);
     });
 
-    await redisClient.setEx(cacheKey, 900, JSON.stringify(leaderboard));
+    await redisClient.setEx(cacheKey, 1810, JSON.stringify(leaderboard));
     res.json(leaderboard);
   } catch (error) {
     console.error('Leetcode fetch error:', error);
