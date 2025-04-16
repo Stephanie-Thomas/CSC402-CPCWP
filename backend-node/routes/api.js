@@ -75,8 +75,9 @@ router.get('/leetcode-leaderboard', async (req, res) => {
     for (const username of users) {
       try {
         const [profileRes, contestRes] = await Promise.all([
-          axios.get(`http://leetcode_api:3000/userProfile/${username}`),
-          axios.get(`http://leetcode_api:3000/userContestRankingInfo/${username}`)
+          axios.get(`https://dockerbackendtest.onrender.com/userProfile/${username}`)
+          axios.get(`https://dockerbackendtest.onrender.com/userContestRankingInfo/${username}`)
+          
         ]);
         profileDataMap.set(username, profileRes.data);
         contestHistoryMap.set(username, contestRes.data.data?.userContestRankingHistory || []);
