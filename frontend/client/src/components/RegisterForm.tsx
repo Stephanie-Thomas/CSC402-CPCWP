@@ -45,7 +45,7 @@ export default function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
     <form onSubmit={handleSubmit} className="space-y-3">
       <Input
         name="name"
-        placeholder="Full Name"
+        placeholder="Display Name"
         value={formData.name}
         onChange={handleChange}
         required

@@ -5,6 +5,8 @@ const User = require('../models/userModel');
 
 const router = express.Router();
 
+const LEETCODE_API_BASE = "https://alfa-leetcode-api.onrender.com";
+
 // Codeforces leaderboard endpoint
 router.get('/codeforces-leaderboard', async (req, res) => {
   const cacheKey = 'Codeforcesleaderboard';
@@ -75,8 +77,8 @@ router.get('/leetcode-leaderboard', async (req, res) => {
     for (const username of users) {
       try {
         const [profileRes, contestRes] = await Promise.all([
-          axios.get(`https://dockerbackendtest.onrender.com/userProfile/${username}`),
-          axios.get(`https://dockerbackendtest.onrender.com/userContestRankingInfo/${username}`)
+          axios.get(`${LEETCODE_API_BASE}/userProfile/${username}`),
+          axios.get(`${LEETCODE_API_BASE}/userContestRankingInfo/${username}`)
           
         ]);
         profileDataMap.set(username, profileRes.data);
