@@ -1,6 +1,7 @@
+import { useEffect, useState } from "react";
+import { useQuery, queryClient } from "@tanstack/react-query";
 import { Navbar } from "@/components/navbar";
 import { Leaderboard } from "@/components/leaderboard";
-import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Code, Terminal, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -46,7 +47,40 @@ function LeaderboardSkeleton() {
 }
 
 export default function VerticalDisplay() {
-  // Fetch Codeforces data.
+  const [secondsLeft, setSecondsLeft] = useState(1800); // 30 minutes in seconds
+
+  // Countdown timer
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSecondsLeft((prev) => (prev === 0 ? 1800 : prev - 1));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Trigger backend ping + refresh logic
+  useEffect(() => {
+    if (secondsLeft === 60) {
+      // Ping backend to warm it up
+      fetch(`${API_BASE_URL}api/codeforces-leaderboard`).catch(() => {});
+      fetch(`${API_BASE_URL}api/leetcode-leaderboard`).catch(() => {});
+    }
+    if (secondsLeft === 0) {
+      // Trigger backend refresh and refetch on frontend
+      fetch(`${API_BASE_URL}api/refresh-leaderboards`, { method: "POST" })
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: ["/api/codeforces-leaderboard"] });
+          queryClient.invalidateQueries({ queryKey: ["/api/leetcode-leaderboard"] });
+        })
+        .catch(() => {});
+    }
+  }, [secondsLeft]);
+
+  // Format seconds to mm:ss
+  const formatTime = (s: number) =>
+    `${Math.floor(s / 60)
+      .toString()
+      .padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
+
   const { data: codeforcesData, isLoading: isLoadingCF, error: cfError } =
     useQuery<CodeforcesUser[]>({
       queryKey: ["/api/codeforces-leaderboard"],
@@ -58,7 +92,6 @@ export default function VerticalDisplay() {
       refetchInterval: 30000,
     });
 
-  // Fetch LeetCode data.
   const { data: leetcodeData, isLoading: isLoadingLC, error: lcError } =
     useQuery<LeetCodeUser[]>({
       queryKey: ["/api/leetcode-leaderboard"],
@@ -80,7 +113,6 @@ export default function VerticalDisplay() {
     </Alert>
   );
 
-  // Process and sort Codeforces data descending by rating (score).
   const processedCodeforces =
     codeforcesData?.map((user) => ({
       id: user.handle,
@@ -90,10 +122,6 @@ export default function VerticalDisplay() {
       problemsSolved: 0,
     }))?.sort((a, b) => b.score - a.score) || [];
 
-  // Process LeetCode data:
-  // - Map contestRanking to `score` (using 0 when not available)
-  // - Include contest info from contestTitle
-  // - Sort in ascending order so that lower places come first
   const processedLeetCode =
     leetcodeData?.map((user) => ({
       id: user.username,
@@ -117,6 +145,11 @@ export default function VerticalDisplay() {
         <div className="absolute -z-10 top-24 -left-24 w-72 h-72 bg-primary/5 rounded-full"></div>
         <div className="absolute -z-10 top-36 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
         <div className="absolute -z-10 bottom-24 left-1/3 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
+
+        {/* Refresh timer */}
+        <div className="text-center text-sm text-gray-500 mb-4">
+          Refreshing in <strong>{formatTime(secondsLeft)}</strong>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
           <div className="flex flex-col">

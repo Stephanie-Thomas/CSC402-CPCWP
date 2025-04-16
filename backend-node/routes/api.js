@@ -168,4 +168,16 @@ router.post('/register', async (req, res) => {
   }
 });
 
+//refresh and pull new redis cache
+router.post('/refresh-leaderboards', async (req, res) => {
+  try {
+    await redisClient.del('Codeforcesleaderboard');
+    await redisClient.del('leetcodeLeaderboard');
+    res.status(200).json({ message: "Leaderboard cache cleared" });
+  } catch (error) {
+    console.error("Error clearing leaderboard cache:", error);
+    res.status(500).json({ message: "Failed to refresh leaderboard cache" });
+  }
+});
+
 module.exports = router;
