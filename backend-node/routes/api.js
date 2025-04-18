@@ -46,7 +46,7 @@ router.get('/codeforces-leaderboard', async (req, res) => {
       }
     }
 
-    await redisClient.setEx(cacheKey, 1810, JSON.stringify(leaderboard));
+    await redisClient.setEx(cacheKey, 120, JSON.stringify(leaderboard)); // 2 minutes
 
     await CachedLeaderboard.findOneAndUpdate(
       { type: 'codeforces' },
@@ -140,7 +140,7 @@ router.get('/leetcode-leaderboard', async (req, res) => {
       return parseInt(a.contestRanking) - parseInt(b.contestRanking);
     });
 
-    await redisClient.setEx(cacheKey, 1810, JSON.stringify(leaderboard));
+    await redisClient.setEx(cacheKey, 120, JSON.stringify(leaderboard)); // 2 minutes
 
     await CachedLeaderboard.findOneAndUpdate(
       { type: 'leetcode' },
@@ -152,6 +152,37 @@ router.get('/leetcode-leaderboard', async (req, res) => {
   } catch (err) {
     console.error('Fetch error (Leetcode):', err);
     res.status(500).json({ error: 'Failed to fetch leaderboard' });
+  }
+});
+
+// === Register User ===
+router.post('/register', async (req, res) => {
+  try {
+    const { name, email, leetcodeUsername, codeforcesUsername } = req.body;
+
+    if (!name || !email || !leetcodeUsername || !codeforcesUsername) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    if (!email.toLowerCase().endsWith("@wcupa.edu")) {
+      return res.status(400).json({ message: "Only @wcupa.edu emails are allowed." });
+    }
+
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+      return res.status(400).json({ message: "Email already in use." });
+    }
+
+    const newUser = new User({ name, email, leetcodeUsername, codeforcesUsername });
+    await newUser.save();
+
+    await redisClient.del('Codeforcesleaderboard');
+    await redisClient.del('leetcodeLeaderboard');
+
+    res.status(201).json({ message: "Successfully registered." });
+  } catch (error) {
+    console.error("Register error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
