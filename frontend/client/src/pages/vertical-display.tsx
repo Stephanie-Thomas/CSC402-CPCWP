@@ -1,6 +1,6 @@
 // src/pages/vertical-display.tsx
-import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { Navbar } from "@/components/navbar";
 import { Leaderboard } from "@/components/leaderboard";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -48,36 +48,6 @@ function LeaderboardSkeleton() {
 }
 
 export default function VerticalDisplay() {
-  const [timer, setTimer] = useState(0); // Just initialize to 0
-
-  // Timer countdown + ping backend at 120 seconds
-  useEffect(() => {
-    const updateTimer = () => {
-      const now = new Date();
-      const minutes = now.getMinutes();
-      const seconds = now.getSeconds();
-      const remainder = 30 - (minutes % 30);
-      const newTimer = remainder * 60 - seconds;
-      setTimer(newTimer);
-
-      if (newTimer === 120) {
-        fetch(`${API_BASE_URL}api/codeforces-leaderboard`);
-        fetch(`${API_BASE_URL}api/leetcode-leaderboard`);
-      }
-    };
-
-    updateTimer(); // Initialize immediately on mount
-    const interval = setInterval(updateTimer, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const formatTime = (seconds: number) => {
-    const min = Math.floor(seconds / 60).toString().padStart(2, "0");
-    const sec = (seconds % 60).toString().padStart(2, "0");
-    return `${min}:${sec}`;
-  };
-
   const { data: codeforcesData, isLoading: isLoadingCF, error: cfError } =
     useQuery<CodeforcesUser[]>({
       queryKey: ["/api/codeforces-leaderboard"],
@@ -86,7 +56,7 @@ export default function VerticalDisplay() {
         if (!res.ok) throw new Error("Failed to fetch Codeforces leaderboard");
         return res.json();
       },
-      refetchInterval: 1800000, // 30 minutes
+      refetchInterval: 300000, // 5 minutes
     });
 
   const { data: leetcodeData, isLoading: isLoadingLC, error: lcError } =
@@ -97,7 +67,7 @@ export default function VerticalDisplay() {
         if (!res.ok) throw new Error("Failed to fetch LeetCode leaderboard");
         return res.json();
       },
-      refetchInterval: 1800000, // 30 minutes
+      refetchInterval: 300000, // 5 minutes
     });
 
   const renderError = (message: string) => (
@@ -110,29 +80,35 @@ export default function VerticalDisplay() {
     </Alert>
   );
 
-  const processedCodeforces =
-    codeforcesData?.map((user) => ({
-      id: user.handle,
-      username: user.handle,
-      score: user.rating || 0,
-      rank: user.rank,
-      problemsSolved: 0,
-    }))?.sort((a, b) => b.score - a.score) || [];
+  const processedCodeforces = useMemo(
+    () =>
+      codeforcesData?.map((user) => ({
+        id: user.handle,
+        username: user.handle,
+        score: user.rating || 0,
+        rank: user.rank,
+        problemsSolved: 0,
+      }))?.sort((a, b) => b.score - a.score) || [],
+    [codeforcesData]
+  );
 
-  const processedLeetCode =
-    leetcodeData?.map((user) => ({
-      id: user.username,
-      username: user.username,
-      score: parseInt(user.contestRanking) || 0,
-      rank: user.overallRanking,
-      problemsSolved: user.totalSolved,
-      contest: user.contestTitle,
-    }))?.sort((a, b) => {
-      if (a.score === 0 && b.score === 0) return 0;
-      if (a.score === 0) return 1;
-      if (b.score === 0) return -1;
-      return a.score - b.score;
-    }) || [];
+  const processedLeetCode = useMemo(
+    () =>
+      leetcodeData?.map((user) => ({
+        id: user.username,
+        username: user.username,
+        score: parseInt(user.contestRanking) || 0,
+        rank: user.overallRanking,
+        problemsSolved: user.totalSolved,
+        contest: user.contestTitle,
+      }))?.sort((a, b) => {
+        if (a.score === 0 && b.score === 0) return 0;
+        if (a.score === 0) return 1;
+        if (b.score === 0) return -1;
+        return a.score - b.score;
+      }) || [],
+    [leetcodeData]
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950">
@@ -142,10 +118,6 @@ export default function VerticalDisplay() {
         <div className="absolute -z-10 top-24 -left-24 w-72 h-72 bg-primary/5 rounded-full"></div>
         <div className="absolute -z-10 top-36 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
         <div className="absolute -z-10 bottom-24 left-1/3 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
-
-        <div className="text-center font-mono text-sm text-gray-600 dark:text-gray-400 mb-6">
-          Refreshing leaderboard in: <strong>{formatTime(timer)}</strong>
-        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
           <div className="flex flex-col">
