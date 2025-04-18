@@ -2,7 +2,6 @@ const express = require('express');
 const axios = require('axios');
 const redisClient = require('../redisClient');
 const User = require('../models/userModel');
-const CachedLeaderboard = require('../models/cachedLeaderboard');
 
 const router = express.Router();
 const LEETCODE_API_BASE = "https://alfa-leetcode-api.onrender.com";
@@ -16,13 +15,6 @@ router.get('/codeforces-leaderboard', async (req, res) => {
     if (cachedData) return res.json(JSON.parse(cachedData));
   } catch (err) {
     console.error('Redis error (Codeforces):', err);
-  }
-
-  try {
-    const doc = await CachedLeaderboard.findOne({ type: 'codeforces' });
-    if (doc?.data?.length) return res.json(doc.data);
-  } catch (err) {
-    console.error('Mongo fallback error (Codeforces):', err);
   }
 
   try {
@@ -46,14 +38,7 @@ router.get('/codeforces-leaderboard', async (req, res) => {
       }
     }
 
-    await redisClient.setEx(cacheKey, 120, JSON.stringify(leaderboard)); // 2 minutes
-
-    await CachedLeaderboard.findOneAndUpdate(
-      { type: 'codeforces' },
-      { data: leaderboard, lastUpdated: new Date() },
-      { upsert: true }
-    );
-
+    await redisClient.setEx(cacheKey, 120, JSON.stringify(leaderboard)); // 2-minute cache
     res.json(leaderboard);
   } catch (err) {
     console.error('Fetch error (Codeforces):', err);
@@ -70,13 +55,6 @@ router.get('/leetcode-leaderboard', async (req, res) => {
     if (cachedData) return res.json(JSON.parse(cachedData));
   } catch (err) {
     console.error('Redis error (Leetcode):', err);
-  }
-
-  try {
-    const doc = await CachedLeaderboard.findOne({ type: 'leetcode' });
-    if (doc?.data?.length) return res.json(doc.data);
-  } catch (err) {
-    console.error('Mongo fallback error (Leetcode):', err);
   }
 
   try {
@@ -140,14 +118,7 @@ router.get('/leetcode-leaderboard', async (req, res) => {
       return parseInt(a.contestRanking) - parseInt(b.contestRanking);
     });
 
-    await redisClient.setEx(cacheKey, 120, JSON.stringify(leaderboard)); // 2 minutes
-
-    await CachedLeaderboard.findOneAndUpdate(
-      { type: 'leetcode' },
-      { data: leaderboard, lastUpdated: new Date() },
-      { upsert: true }
-    );
-
+    await redisClient.setEx(cacheKey, 120, JSON.stringify(leaderboard)); // 2-minute cache
     res.json(leaderboard);
   } catch (err) {
     console.error('Fetch error (Leetcode):', err);
