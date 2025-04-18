@@ -2,117 +2,126 @@ const express = require('express');
 const axios = require('axios');
 const redisClient = require('../redisClient');
 const User = require('../models/userModel');
+const CachedLeaderboard = require('../models/cachedLeaderboard');
 
 const router = express.Router();
-
 const LEETCODE_API_BASE = "https://alfa-leetcode-api.onrender.com";
 
-// Codeforces leaderboard endpoint
+// === Codeforces Leaderboard ===
 router.get('/codeforces-leaderboard', async (req, res) => {
   const cacheKey = 'Codeforcesleaderboard';
 
   try {
     const cachedData = await redisClient.get(cacheKey);
-    if (cachedData) {
-      return res.json(JSON.parse(cachedData));
-    }
-  } catch (error) {
-    console.error('Redis error (Codeforces):', error);
+    if (cachedData) return res.json(JSON.parse(cachedData));
+  } catch (err) {
+    console.error('Redis error (Codeforces):', err);
   }
 
   try {
-    const usersFromDB = await User.find({}, 'codeforcesUsername');
-    const users = usersFromDB
-      .map(user => user.codeforcesUsername)
+    const doc = await CachedLeaderboard.findOne({ type: 'codeforces' });
+    if (doc?.data?.length) return res.json(doc.data);
+  } catch (err) {
+    console.error('Mongo fallback error (Codeforces):', err);
+  }
+
+  try {
+    const users = (await User.find({}, 'codeforcesUsername'))
+      .map(u => u.codeforcesUsername)
       .filter(Boolean);
 
     const leaderboard = [];
 
     for (const user of users) {
       try {
-        const response = await axios.get(`https://codeforces.com/api/user.info?handles=${user}`);
-        const userData = response?.data?.result?.[0];
+        const res = await axios.get(`https://codeforces.com/api/user.info?handles=${user}`);
+        const info = res?.data?.result?.[0];
         leaderboard.push({
-          handle: userData?.handle || user,
-          rating: userData?.rating || null,
-          rank: userData?.rank || 'N/A'
+          handle: info?.handle || user,
+          rating: info?.rating || null,
+          rank: info?.rank || 'N/A',
         });
       } catch {
         leaderboard.push({ handle: user, rating: null, rank: 'N/A' });
       }
     }
 
-    await redisClient.setEx(cacheKey, 900, JSON.stringify(leaderboard));
+    await redisClient.setEx(cacheKey, 1810, JSON.stringify(leaderboard));
+
+    await CachedLeaderboard.findOneAndUpdate(
+      { type: 'codeforces' },
+      { data: leaderboard, lastUpdated: new Date() },
+      { upsert: true }
+    );
+
     res.json(leaderboard);
-  } catch (error) {
-    console.error('Codeforces fetch error:', error);
-    res.status(500).json({ error: 'Failed to fetch leaderboard data' });
+  } catch (err) {
+    console.error('Fetch error (Codeforces):', err);
+    res.status(500).json({ error: 'Failed to fetch leaderboard' });
   }
 });
 
-// Leetcode leaderboard endpoint
+// === LeetCode Leaderboard ===
 router.get('/leetcode-leaderboard', async (req, res) => {
   const cacheKey = 'leetcodeLeaderboard';
 
   try {
     const cachedData = await redisClient.get(cacheKey);
-    if (cachedData) {
-      return res.json(JSON.parse(cachedData));
-    }
-  } catch (error) {
-    console.error('Redis error (Leetcode):', error);
+    if (cachedData) return res.json(JSON.parse(cachedData));
+  } catch (err) {
+    console.error('Redis error (Leetcode):', err);
   }
 
   try {
+    const doc = await CachedLeaderboard.findOne({ type: 'leetcode' });
+    if (doc?.data?.length) return res.json(doc.data);
+  } catch (err) {
+    console.error('Mongo fallback error (Leetcode):', err);
+  }
 
-    const usersFromDB = await User.find({}, 'leetcodeUsername');
-    const users = usersFromDB
-      .map(user => user.leetcodeUsername)
+  try {
+    const users = (await User.find({}, 'leetcodeUsername'))
+      .map(u => u.leetcodeUsername)
       .filter(Boolean);
 
-
-    const profileDataMap = new Map();
-    const contestHistoryMap = new Map();
+    const profileMap = new Map();
+    const historyMap = new Map();
 
     for (const username of users) {
       try {
-        const [profileRes, contestRes] = await Promise.all([
+        const [profile, history] = await Promise.all([
           axios.get(`${LEETCODE_API_BASE}/userProfile/${username}`),
-          axios.get(`${LEETCODE_API_BASE}/userContestRankingInfo/${username}`)
-          
+          axios.get(`${LEETCODE_API_BASE}/userContestRankingInfo/${username}`),
         ]);
-        profileDataMap.set(username, profileRes.data);
-        contestHistoryMap.set(username, contestRes.data.data?.userContestRankingHistory || []);
+        profileMap.set(username, profile.data);
+        historyMap.set(username, history.data.data?.userContestRankingHistory || []);
       } catch {
-        profileDataMap.set(username, { totalSolved: 0, ranking: 'N/A' });
-        contestHistoryMap.set(username, []);
+        profileMap.set(username, { totalSolved: 0, ranking: 'N/A' });
+        historyMap.set(username, []);
       }
     }
 
-    let globalLatestStartTime = null;
-    for (const history of contestHistoryMap.values()) {
-      for (const entry of history) {
-        const time = parseInt(entry?.contest?.startTime);
-        const rank = entry?.ranking?.toString();
-        if (rank && rank !== 'N/A' && rank !== '0' && (!globalLatestStartTime || time > globalLatestStartTime)) {
-          globalLatestStartTime = time;
+    let latestTime = null;
+    for (const hist of historyMap.values()) {
+      for (const e of hist) {
+        const t = parseInt(e?.contest?.startTime);
+        if (e?.ranking && e.ranking !== '0' && (!latestTime || t > latestTime)) {
+          latestTime = t;
         }
       }
     }
 
     const leaderboard = users.map(username => {
-      const profile = profileDataMap.get(username) || {};
-      const history = contestHistoryMap.get(username) || [];
+      const profile = profileMap.get(username) || {};
+      const history = historyMap.get(username) || [];
       let contestRanking = 'N/A';
       let contestTitle = null;
 
-      if (globalLatestStartTime) {
-        for (const entry of history) {
-          if (entry?.contest?.startTime?.toString() === globalLatestStartTime.toString()) {
-            contestRanking = entry.ranking?.toString() || 'N/A';
-            contestTitle = entry.contest.title || null;
-            break;
-          }
+      for (const entry of history) {
+        if (entry?.contest?.startTime?.toString() === latestTime?.toString()) {
+          contestRanking = entry.ranking?.toString() || 'N/A';
+          contestTitle = entry.contest.title || null;
+          break;
         }
       }
 
@@ -121,7 +130,7 @@ router.get('/leetcode-leaderboard', async (req, res) => {
         totalSolved: profile.totalSolved || 0,
         overallRanking: profile.ranking?.toString() || 'N/A',
         contestRanking,
-        contestTitle
+        contestTitle,
       };
     });
 
@@ -132,54 +141,17 @@ router.get('/leetcode-leaderboard', async (req, res) => {
     });
 
     await redisClient.setEx(cacheKey, 1810, JSON.stringify(leaderboard));
+
+    await CachedLeaderboard.findOneAndUpdate(
+      { type: 'leetcode' },
+      { data: leaderboard, lastUpdated: new Date() },
+      { upsert: true }
+    );
+
     res.json(leaderboard);
-  } catch (error) {
-    console.error('Leetcode fetch error:', error);
-    res.status(500).json({ error: 'Failed to fetch leaderboard data' });
-  }
-});
-
-// Register user
-router.post('/register', async (req, res) => {
-  try {
-    const { name, email, leetcodeUsername, codeforcesUsername } = req.body;
-
-    if (!name || !email || !leetcodeUsername || !codeforcesUsername) {
-      return res.status(400).json({ message: "All fields are required." });
-    }
-
-    if (!email.toLowerCase().endsWith("@wcupa.edu")) {
-      return res.status(400).json({ message: "Only @wcupa.edu emails are allowed." });
-    }
-
-    const existingEmail = await User.findOne({ email });
-    if (existingEmail) {
-      return res.status(400).json({ message: "Email already in use." });
-    }
-
-    const newUser = new User({ name, email, leetcodeUsername, codeforcesUsername });
-    await newUser.save();
-    // Clear leaderboard cache
-    await redisClient.del('Codeforcesleaderboard');
-    await redisClient.del('leetcodeLeaderboard');
-    
-    return res.status(201).json({ message: "Successfully registered." });
-
-  } catch (error) {
-    console.error("Register error:", error);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-
-//refresh and pull new redis cache
-router.post('/refresh-leaderboards', async (req, res) => {
-  try {
-    await redisClient.del('Codeforcesleaderboard');
-    await redisClient.del('leetcodeLeaderboard');
-    res.status(200).json({ message: "Leaderboard cache cleared" });
-  } catch (error) {
-    console.error("Error clearing leaderboard cache:", error);
-    res.status(500).json({ message: "Failed to refresh leaderboard cache" });
+  } catch (err) {
+    console.error('Fetch error (Leetcode):', err);
+    res.status(500).json({ error: 'Failed to fetch leaderboard' });
   }
 });
 
