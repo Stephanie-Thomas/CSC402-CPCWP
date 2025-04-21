@@ -27,7 +27,9 @@ mongoose.connect(process.env.MONGO_URI, {
 });
 
 // Middleware
-app.use(cors({ origin: CLIENT_ORIGIN })); // Load from .env
+app.use(cors({
+  origin: process.env.CLIENT_ORIGIN || "*"
+})); // Load from .env
 app.use(express.json());
 app.use('/api', apiRoutes);
 
