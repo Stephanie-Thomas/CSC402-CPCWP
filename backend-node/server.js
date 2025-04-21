@@ -18,11 +18,11 @@ mongoose.connect(process.env.MONGO_URI, {
 })
 .then(() => {
   app.listen(PORT, () => {
-    console.log(`✅ Backend server running on port ${PORT}`);
+    console.log(`Backend server running on port ${PORT}`);
   });
 })
 .catch((err) => {
-  console.error("❌ MongoDB Connection Error:", err);
+  console.error("MongoDB Connection Error:", err);
 });
 
 // Middleware
@@ -31,6 +31,6 @@ app.use(express.json());
 app.use('/api', apiRoutes);
 
 setInterval(() => {
-    console.log("✅ Server is still running...");
+    console.log("Server is still running...");
   }, 30000); // logs every 30 seconds
   
