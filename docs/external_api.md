@@ -7,6 +7,7 @@ This documentation explains where we are getting our LeetCode and Codeforces dat
 Some of the data we utilize from the LeetCode open source project are:
 - **User Profile:** Detailed statistics and profile information for a given LeetCode username.
 - **Contest Ranking Information:** Data on contest performance and rankings.
+⚠️ Note that the leetcode API may take a couple of days for the most recent Leetcode contest data to be availabe.
 
 ## Codeforces API
 
