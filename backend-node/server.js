@@ -9,7 +9,8 @@ dotenv.config(); // Load environment variables
 const apiRoutes = require('./routes/api.js');
 
 const app = express();
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 4000; // Load from .env
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN; // Load from .env
 
 // Connect to MongoDB Atlas
 mongoose.connect(process.env.MONGO_URI, {
@@ -26,11 +27,12 @@ mongoose.connect(process.env.MONGO_URI, {
 });
 
 // Middleware
-app.use(cors({ origin: 'https://csc402-cpcwp.onrender.com' }));
+app.use(cors({
+  origin: process.env.CLIENT_ORIGIN || "*"
+})); // Load from .env
 app.use(express.json());
 app.use('/api', apiRoutes);
 
 setInterval(() => {
-    console.log("Server is still running...");
-  }, 30000); // logs every 30 seconds
-  
+  console.log("Server is still running...");
+}, 30000); // logs every 30 seconds
