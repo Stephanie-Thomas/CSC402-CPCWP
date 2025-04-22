@@ -92,7 +92,7 @@ export function Leaderboard({ title, users }: LeaderboardProps) {
                   {title === "LeetCode" ? (
                     <div className="text-right">
                       <div className="text-sm font-bold text-gray-900 dark:text-gray-100">
-                        {user.score !== 0 ? `#${user.score}` : "N/A"}
+                        #{index + 1}
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400">Place</div>
                     </div>
