@@ -65,7 +65,7 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Leaderboard Section - moved up */}
+        {/* Leaderboard Section */}
         <div className="container mx-auto px-4 pb-16">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center justify-center gap-2 mb-6">
@@ -79,7 +79,7 @@ export default function Home() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-6xl mx-auto">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center">
             <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-3">
               <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
@@ -88,6 +88,14 @@ export default function Home() {
               {memberCount !== null ? `${memberCount}+` : "Loading..."}
             </span>
             <span className="text-sm text-gray-500 dark:text-gray-400 mt-1">Active Members</span>
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center">
+            <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-3">
+              <Code className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+            </div>
+            <span className="text-3xl font-bold text-gray-900 dark:text-white">200+</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400 mt-1">Problems Solved</span>
           </div>
 
           <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center">
