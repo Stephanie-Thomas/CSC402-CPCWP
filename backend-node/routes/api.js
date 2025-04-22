@@ -47,10 +47,14 @@ router.get('/codeforces-leaderboard', async (req, res) => {
 });
 
 // === LeetCode Leaderboard ===
+// === LeetCode Leaderboard ===
 router.get('/leetcode-leaderboard', async (req, res) => {
   const cacheKey = 'leetcodeLeaderboard';
 
   try {
+    // Optional: clear cache manually here if needed
+    // await redisClient.del(cacheKey);
+
     const cachedData = await redisClient.get(cacheKey);
     if (cachedData) return res.json(JSON.parse(cachedData));
   } catch (err) {
@@ -80,30 +84,29 @@ router.get('/leetcode-leaderboard', async (req, res) => {
     }
 
     // Step 1: Find the most recent contest any user participated in
-    let latestContest = null;
-    let latestStartTime = 0;
+    let latestTime = null;
 
-    for (const history of historyMap.values()) {
-      for (const entry of history) {
-        const startTime = parseInt(entry?.contest?.startTime);
-        if (entry?.ranking && entry.ranking !== '0' && startTime > latestStartTime) {
-          latestStartTime = startTime;
-          latestContest = entry?.contest?.title || null;
+    for (const hist of historyMap.values()) {
+      for (const e of hist) {
+        const t = parseInt(e?.contest?.startTime);
+        if (e?.ranking && e.ranking !== '0' && (!latestTime || t > latestTime)) {
+          latestTime = t;
         }
       }
     }
 
-    // Step 2: Build leaderboard using only that contest
+    // Step 2: Build leaderboard based on participation in that contest
     const leaderboard = users.map(username => {
       const profile = profileMap.get(username) || {};
       const history = historyMap.get(username) || [];
 
       let contestRanking = 'N/A';
+      let contestTitle = null;
 
       for (const entry of history) {
-        const entryTime = parseInt(entry?.contest?.startTime);
-        if (entryTime === latestStartTime && entry?.ranking && entry.ranking !== '0') {
-          contestRanking = entry.ranking.toString();
+        if (entry?.contest?.startTime?.toString() === latestTime?.toString()) {
+          contestRanking = entry.ranking?.toString() || 'N/A';
+          contestTitle = entry.contest.title || null;
           break;
         }
       }
@@ -113,12 +116,12 @@ router.get('/leetcode-leaderboard', async (req, res) => {
         totalSolved: profile.totalSolved || 0,
         overallRanking: profile.ranking?.toString() || 'N/A',
         contestRanking,
-        contestTitle: latestContest,
+        contestTitle,
         score: contestRanking !== 'N/A' ? parseInt(contestRanking) : Infinity
       };
     });
 
-    // Sort by contest ranking (N/A pushed to bottom)
+    // Step 3: Sort by contest rank; N/A goes to the bottom
     leaderboard.sort((a, b) => a.score - b.score);
 
     await redisClient.setEx(cacheKey, 120, JSON.stringify(leaderboard));
