@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navbar } from "@/components/navbar";
-import { Trophy, Users, Calendar, Newspaper, User } from "lucide-react";
+import { useState } from "react";
+import { Trophy, Users, Code, Calendar, Newspaper, User } from "lucide-react";
 import { LeaderboardToggle } from "@/components/leaderboard-toggle";
 
 interface TeamMember {
@@ -77,6 +77,7 @@ export default function Home() {
             <LeaderboardToggle />
           </div>
         </div>
+
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-6xl mx-auto">
