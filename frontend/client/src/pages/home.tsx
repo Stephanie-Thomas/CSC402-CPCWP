@@ -38,7 +38,7 @@ export default function Home() {
   const [memberCount, setMemberCount] = useState<number | null>(null);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_BASE_URL}member-count`)
+    fetch(`${import.meta.env.VITE_API_BASE_URL}api/member-count`)
       .then(res => res.json())
       .then(data => setMemberCount(data.count))
       .catch(err => {
