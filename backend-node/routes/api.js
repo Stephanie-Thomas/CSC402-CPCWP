@@ -131,8 +131,8 @@ router.post('/register', async (req, res) => {
   try {
     const { name, email, leetcodeUsername, codeforcesUsername } = req.body;
 
-    if (!name || !email || !leetcodeUsername || !codeforcesUsername) {
-      return res.status(400).json({ message: "All fields are required." });
+    if (!name || !email || (!leetcodeUsername && !codeforcesUsername)) {
+      return res.status(400).json({ message: "Name, email, and at least one username are required." });
     }
 
     if (!email.toLowerCase().endsWith("@wcupa.edu")) {
