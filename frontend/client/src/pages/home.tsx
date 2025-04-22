@@ -1,7 +1,7 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navbar } from "@/components/navbar";
-import { useState } from "react";
-import { Trophy, Users, Code, Calendar, Newspaper, User } from "lucide-react";
+import { Trophy, Users, Calendar, Newspaper, User } from "lucide-react";
 import { LeaderboardToggle } from "@/components/leaderboard-toggle";
 
 interface TeamMember {
