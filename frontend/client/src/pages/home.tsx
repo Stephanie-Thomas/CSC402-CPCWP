@@ -115,17 +115,6 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Leaderboard Section - moved up */}
-        <div className="max-w-4xl mx-auto mb-16">
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <div className="flex items-center gap-2 bg-primary/10 dark:bg-primary/20 px-4 py-1.5 rounded-full">
-              <Trophy className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-bold text-gray-800 dark:text-white">Leaderboards</h2>
-            </div>
-          </div>
-          <LeaderboardToggle />
-        </div>
-
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-6xl mx-auto">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center">
@@ -229,6 +218,17 @@ export default function Home() {
           </div>
         </section>
       </main>
+
+      {/* Leaderboard Section */}
+      <div className="max-w-4xl mx-auto mb-16">
+          <div className="flex items-center justify-center gap-2 mb-6">
+            <div className="flex items-center gap-2 bg-primary/10 dark:bg-primary/20 px-4 py-1.5 rounded-full">
+              <Trophy className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-bold text-gray-800 dark:text-white">Leaderboards</h2>
+            </div>
+          </div>
+          <LeaderboardToggle />
+        </div>
 
       {/* Footer */}
       <footer className="border-t border-gray-200 dark:border-gray-800 py-8 bg-white dark:bg-gray-900">
