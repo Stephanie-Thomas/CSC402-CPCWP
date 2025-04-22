@@ -157,4 +157,15 @@ router.post('/register', async (req, res) => {
   }
 });
 
+// === User Count ===
+router.get('/member-count', async (req, res) => {
+  try {
+    const count = await User.countDocuments();
+    res.json({ count });
+  } catch (error) {
+    console.error('Error getting member count:', error);
+    res.status(500).json({ error: 'Failed to retrieve member count' });
+  }
+});
+
 module.exports = router;
