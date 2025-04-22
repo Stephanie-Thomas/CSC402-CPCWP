@@ -79,26 +79,19 @@ router.get('/leetcode-leaderboard', async (req, res) => {
       }
     }
 
-    let latestTime = null;
-    for (const hist of historyMap.values()) {
-      for (const e of hist) {
-        const t = parseInt(e?.contest?.startTime);
-        if (e?.ranking && e.ranking !== '0' && (!latestTime || t > latestTime)) {
-          latestTime = t;
-        }
-      }
-    }
-
     const leaderboard = users.map(username => {
       const profile = profileMap.get(username) || {};
       const history = historyMap.get(username) || [];
+
       let contestRanking = 'N/A';
       let contestTitle = null;
 
-      for (const entry of history) {
-        if (entry?.contest?.startTime?.toString() === latestTime?.toString()) {
-          contestRanking = entry.ranking?.toString() || 'N/A';
-          contestTitle = entry.contest.title || null;
+      // Get user's most recent valid contest
+      for (let i = history.length - 1; i >= 0; i--) {
+        const entry = history[i];
+        if (entry?.ranking && entry.ranking !== '0') {
+          contestRanking = entry.ranking.toString();
+          contestTitle = entry.contest?.title || null;
           break;
         }
       }
@@ -108,10 +101,11 @@ router.get('/leetcode-leaderboard', async (req, res) => {
         totalSolved: profile.totalSolved || 0,
         overallRanking: profile.ranking?.toString() || 'N/A',
         contestRanking,
-        contestTitle,
+        contestTitle
       };
     });
 
+    // Sort by contest rank; N/A at the bottom
     leaderboard.sort((a, b) => {
       if (a.contestRanking === 'N/A') return 1;
       if (b.contestRanking === 'N/A') return -1;
