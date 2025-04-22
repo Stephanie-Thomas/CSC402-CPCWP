@@ -101,7 +101,8 @@ router.get('/leetcode-leaderboard', async (req, res) => {
         totalSolved: profile.totalSolved || 0,
         overallRanking: profile.ranking?.toString() || 'N/A',
         contestRanking,
-        contestTitle
+        contestTitle,
+        score: contestRanking !== 'N/A' ? parseInt(contestRanking) : 0 
       };
     });
 
@@ -119,6 +120,7 @@ router.get('/leetcode-leaderboard', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch leaderboard' });
   }
 });
+
 
 // === Register User ===
 router.post('/register', async (req, res) => {
