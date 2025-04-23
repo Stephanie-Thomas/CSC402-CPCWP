@@ -63,14 +63,14 @@ export default function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
         placeholder="LeetCode Username"
         value={formData.leetcodeUsername}
         onChange={handleChange}
-        required
+        
       />
       <Input
         name="codeforcesUsername"
         placeholder="Codeforces Username"
         value={formData.codeforcesUsername}
         onChange={handleChange}
-        required
+        
       />
       {error && <p className="text-sm text-red-500">{error}</p>}
       <Button type="submit" className="w-full">

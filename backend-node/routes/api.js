@@ -4,7 +4,7 @@ const redisClient = require('../redisClient');
 const User = require('../models/userModel');
 
 const router = express.Router();
-const LEETCODE_API_BASE = "https://alfa-leetcode-api.onrender.com";
+const LEETCODE_API_BASE = "https://wculeetcode-api.onrender.com";
 
 // === Codeforces Leaderboard ===
 router.get('/codeforces-leaderboard', async (req, res) => {
