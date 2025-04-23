@@ -68,9 +68,7 @@ router.get('/leetcode-leaderboard', async (req, res) => {
     const profileDataMap = new Map();
     const contestHistoryMap = new Map();
 
-    const LEETCODE_API_BASE = 'https://alfa-leetcode-api.onrender.com';
-
-    for (const username of users) {
+      for (const username of users) {
       try {
         const [profileResponse, contestResponse] = await Promise.all([
           axios.get(`${LEETCODE_API_BASE}/userProfile/${username}`),
