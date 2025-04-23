@@ -46,91 +46,108 @@ router.get('/codeforces-leaderboard', async (req, res) => {
   }
 });
 
-// === LeetCode Leaderboard ===
-// === LeetCode Leaderboard ===
+// Leetcode leaderboard endpoint
 router.get('/leetcode-leaderboard', async (req, res) => {
   const cacheKey = 'leetcodeLeaderboard';
 
   try {
-    // Optional: clear cache manually here if needed
-    // await redisClient.del(cacheKey);
-
-    const cachedData = await redisClient.get(cacheKey);
-    if (cachedData) return res.json(JSON.parse(cachedData));
-  } catch (err) {
-    console.error('Redis error (Leetcode):', err);
+      const cachedData = await redisClient.get(cacheKey);
+      if (cachedData) {
+          console.log('Returning cached LeetCode leaderboard data from Redis');
+          return res.json(JSON.parse(cachedData));
+      }
+  } catch (error) {
+      console.error('Error accessing Redis cache:', error);
   }
 
   try {
-    const users = (await User.find({}, 'leetcodeUsername'))
+      const users = (await User.find({}, 'leetcodeUsername'))
       .map(u => u.leetcodeUsername)
       .filter(Boolean);
 
-    const profileMap = new Map();
-    const historyMap = new Map();
+    const profileDataMap = new Map();
+    const contestHistoryMap = new Map();
+
+    const LEETCODE_API_BASE = 'https://alfa-leetcode-api.onrender.com';
 
     for (const username of users) {
       try {
-        const [profile, history] = await Promise.all([
+        const [profileResponse, contestResponse] = await Promise.all([
           axios.get(`${LEETCODE_API_BASE}/userProfile/${username}`),
-          axios.get(`${LEETCODE_API_BASE}/userContestRankingInfo/${username}`),
+          axios.get(`${LEETCODE_API_BASE}/userContestRankingInfo/${username}`)
         ]);
-        profileMap.set(username, profile.data);
-        historyMap.set(username, history.data.data?.userContestRankingHistory || []);
-      } catch {
-        profileMap.set(username, { totalSolved: 0, ranking: 'N/A' });
-        historyMap.set(username, []);
+
+        profileDataMap.set(username, profileResponse.data);
+        contestHistoryMap.set(username, contestResponse.data.data?.userContestRankingHistory || []);
+      } catch (error) {
+        console.error(`Error fetching data for ${username}:`, error.message);
+        profileDataMap.set(username, { totalSolved: 0, ranking: 'N/A' });
+        contestHistoryMap.set(username, []);
       }
     }
 
-    // Step 1: Find the most recent contest any user participated in
-    let latestTime = null;
+      // Find global latest valid contest
+      let globalLatestStartTime = null;
+      for (const [username, history] of contestHistoryMap) {
+          for (const entry of history) {
+              const ranking = entry.ranking?.toString() || 'N/A';
+              if (ranking === 'N/A' || ranking === '0') continue;
 
-    for (const hist of historyMap.values()) {
-      for (const e of hist) {
-        const t = parseInt(e?.contest?.startTime);
-        if (e?.ranking && e.ranking !== '0' && (!latestTime || t > latestTime)) {
-          latestTime = t;
-        }
-      }
-    }
-
-    // Step 2: Build leaderboard based on participation in that contest
-    const leaderboard = users.map(username => {
-      const profile = profileMap.get(username) || {};
-      const history = historyMap.get(username) || [];
-
-      let contestRanking = 'N/A';
-      let contestTitle = null;
-
-      for (const entry of history) {
-        if (entry?.contest?.startTime?.toString() === latestTime?.toString()) {
-          contestRanking = entry.ranking?.toString() || 'N/A';
-          contestTitle = entry.contest.title || null;
-          break;
-        }
+              const contest = entry.contest;
+              if (contest?.startTime) {
+                  const startTime = parseInt(contest.startTime);
+                  if (!globalLatestStartTime || startTime > globalLatestStartTime) {
+                      globalLatestStartTime = startTime;
+                  }
+              }
+          }
       }
 
-      return {
-        username,
-        totalSolved: profile.totalSolved || 0,
-        overallRanking: profile.ranking?.toString() || 'N/A',
-        contestRanking,
-        contestTitle,
-        score: contestRanking !== 'N/A' ? parseInt(contestRanking) : Infinity
-      };
-    });
+      // Build leaderboard
+      const leaderboard = [];
+      for (const username of users) {
+          const profile = profileDataMap.get(username) || {};
+          const history = contestHistoryMap.get(username) || [];
+          
+          let contestRanking = 'N/A';
+          let contestTitle = null;
+          
+          if (globalLatestStartTime) {
+              for (const entry of history) {
+                  const contest = entry.contest || {};
+                  if (contest.startTime?.toString() === globalLatestStartTime?.toString()) {
+                      contestRanking = entry.ranking?.toString() || 'N/A';
+                      contestTitle = contest.title || null;
+                      break;
+                  }
+              }
+          }
 
-    // Step 3: Sort by contest rank; N/A goes to the bottom
-    leaderboard.sort((a, b) => a.score - b.score);
+          leaderboard.push({
+              username,
+              totalSolved: profile.totalSolved || 0,
+              overallRanking: profile.ranking?.toString() || 'N/A',
+              contestRanking,
+              contestTitle
+          });
+      }
 
-    await redisClient.setEx(cacheKey, 120, JSON.stringify(leaderboard));
-    res.json(leaderboard);
-  } catch (err) {
-    console.error('Fetch error (Leetcode):', err);
-    res.status(500).json({ error: 'Failed to fetch leaderboard' });
+      // Sort leaderboard
+      leaderboard.sort((a, b) => {
+          if (a.contestRanking === 'N/A') return 1;
+          if (b.contestRanking === 'N/A') return -1;
+          return parseInt(a.contestRanking) - parseInt(b.contestRanking);
+      });
+
+      await redisClient.setEx(cacheKey, 900, JSON.stringify(leaderboard));
+      console.log('LeetCode leaderboard data cached in Redis');
+      res.json(leaderboard);
+  } catch (error) {
+      console.error('Error fetching LeetCode leaderboard:', error);
+      res.status(500).json({ error: 'Failed to fetch leaderboard data' });
   }
 });
+
 
 // === Register User ===
 router.post('/register', async (req, res) => {
