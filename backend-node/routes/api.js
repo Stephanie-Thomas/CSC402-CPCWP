@@ -38,7 +38,7 @@ router.get('/codeforces-leaderboard', async (req, res) => {
       }
     }
 
-    await redisClient.setEx(cacheKey, 120, JSON.stringify(leaderboard)); // 2-minute cache
+    await redisClient.setEx(cacheKey, 600, JSON.stringify(leaderboard)); // 10-minute cache
     res.json(leaderboard);
   } catch (err) {
     console.error('Fetch error (Codeforces):', err);
@@ -130,14 +130,22 @@ router.get('/leetcode-leaderboard', async (req, res) => {
           });
       }
 
-      // Sort leaderboard
+      // Don't cache if all data is N/A or missing
+      const hasValidData = leaderboard.some(entry => entry.contestRanking !== 'N/A' && entry.totalSolved > 0);
+      if (!hasValidData) {
+        console.warn("No valid LeetCode data available — skipping cache.");
+        return res.status(503).json({ error: "LeetCode data unavailable." });
+      }
+
+
+      // Sort leaderboard 
       leaderboard.sort((a, b) => {
           if (a.contestRanking === 'N/A') return 1;
           if (b.contestRanking === 'N/A') return -1;
           return parseInt(a.contestRanking) - parseInt(b.contestRanking);
       });
 
-      await redisClient.setEx(cacheKey, 900, JSON.stringify(leaderboard));
+      await redisClient.setEx(cacheKey, 600, JSON.stringify(leaderboard)); // 10-minute cache
       console.log('LeetCode leaderboard data cached in Redis');
       res.json(leaderboard);
   } catch (error) {
