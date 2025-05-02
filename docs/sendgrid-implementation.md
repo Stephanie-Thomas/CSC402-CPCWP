@@ -145,3 +145,46 @@ function verifyCode(email, enteredCode) {
 }
 
 ```
+
+# Alumni Signup Implementation
+
+## Existing Infrastructure
+
+-   An existing route `/signup` is already present in the project files specifically for alumni signups
+-   This endpoint currently collects alumni information but lacks email verification
+
+## Implementation Steps
+
+### 1. Update Navigation
+
+-   Modify the dropdown menu in the navbar
+-   Change the hyperlink destination to redirect to `/signup`
+    
+
+### 2. Modify SendGrid Implementation
+
+While the main SendGrid guide focuses on user verification, for this alumni use case, you will:
+
+1.  Configure SendGrid to send notifications to club officers instead of verification codes to users
+2.  Include all form submission data in the email to officers
+3.  Skip the verification code entry step since this is an officer notification scenario
+
+### 3. Email Content Modifications
+
+The email sent through SendGrid should:
+
+-   Have a clear subject line (e.g., "New Alumni Signup Submission")
+-   Include all information submitted in the alumni form
+-   Format the data in a readable way for officers to review
+-   Potentially include action buttons/links for officers to approve/reject the submission
+
+### 5. Backend Adjustments
+
+-   Modify the `/signup` route handler to:
+    1.  Process the form submission as normal
+    2.  Use SendGrid to email club officers with the submitted information
+
+### 6. Officer Configuration
+
+-   Maintain a list of officer emails in your environment configuration
+-   Consider implementing officer roles/permissions if different officers need different notifications
