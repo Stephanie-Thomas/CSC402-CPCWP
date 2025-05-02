@@ -6,7 +6,8 @@ import { Leaderboard } from "@/components/leaderboard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Code, Terminal, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { retryFetchJSON } from "@/components/lib/retryFetch";
+import { retryFetchJSON } from "@/lib/retryFetch";
+
 
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
