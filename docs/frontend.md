@@ -132,14 +132,3 @@ image: "/news/image.jpg"
 - Team members: Any Square formet, e.g. 256x256px
 
 - News images: Anything 2:1 Aspect Ratio, e.g. 1200x600
-
-  
-  
-
-## Additional Notes
-
-- The Discord Icon on the home page navbar currently does not have a specific link
-	- Navigate to `frontend/client/src/components/navbar.tsx`
-	- Under the section labeled: {/* Right section, CPC Discord Link Here */}
-		- locate the line `href="https://discord.gg"`
-		- Replace the link with a custom link to the CPC Discord
