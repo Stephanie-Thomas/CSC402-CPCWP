@@ -1,13 +1,12 @@
 # Render Deployment Documentation
 **WCU Competitive Programming Club – Leaderboard Project**
 
-This project is deployed on [Render.com](https://render.com) using four services:
+This project is deployed on [Render.com](https://render.com) using three services:
 
 | Service Name       | Type         | GitHub Repo                                   |
 |--------------------|--------------|-----------------------------------------------|
 | Frontend           | Static Site  | https://github.com/Stephanie-Thomas/CSC402-CPCWP |
 | Backend (Node)     | Docker       | https://github.com/Stephanie-Thomas/CSC402-CPCWP |
-| LeetCode API       | Node Service | https://github.com/tobibussiek/leetcode-api     |
 | Redis              | Internal     | Managed by Render (used for leaderboard caching) |
 
 ---
@@ -29,11 +28,11 @@ The frontend connects to the backend via the above API URL. It displays user sta
 
 ---
 
-## 2. Backend (`DockerBackendTest`)
+## 2. Backend (`main-live`)
 
 - Directory: `backend-node`
 - Dockerfile used: `backend-node/Dockerfile.prod`
-- Deployed Branch: `DockerHostingTest`
+- Deployed Branch: `main-live`
 - Autodeploy from GitHub: Enabled, but not currently working automatically (manual deploys required)
 - Environment Variables:
   ```
@@ -45,33 +44,8 @@ The backend stores registered users in MongoDB and retrieves contest data from t
 
 ---
 
-## 3. LeetCode API (`wculeetcode-api`)
 
-- GitHub Repo: https://github.com/tobibussiek/leetcode-api
-- Build Command:
-  ```
-  npm install
-  ```
-- Start Command:
-  ```
-  npm run dev
-  ```
-- Rate Limiting Configuration:
-  You **must add** the following line inside `src/app.ts` after initializing Express:
-  ```ts
-  app.set('trust proxy', true);
-  ```
-
-This service acts as a wrapper around the (unofficial) Alfa LeetCode API and exposes cleaned-up endpoints like:
-
-- `/userProfile/:username`
-- `/userContestRankingInfo/:username`
-- `/userProfileCalendar?username=...`
-- `/userProfileUserQuestionProgressV2/:userSlug`
-
----
-
-## 4. Redis (Render-managed)
+## 3. Redis (Render-managed)
 
 - Redis is used for caching leaderboard results to reduce API calls
 - URL: `redis://red-cve8c9jqf0us738g0q2g:6379`
@@ -83,7 +57,7 @@ This service acts as a wrapper around the (unofficial) Alfa LeetCode API and exp
 
 - The backend fetches contest data from the **LeetCode API** using the public URL:
   ```
-  https://wculeetcode-api.onrender.com
+  https://leetcode-api-production-ee0d.up.railway.app/
   ```
 - MongoDB Atlas is used for user registration persistence
 - Redis is used to cache leaderboard responses for 2 minutes
