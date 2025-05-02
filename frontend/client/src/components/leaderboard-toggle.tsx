@@ -4,6 +4,7 @@ import { Leaderboard } from "./leaderboard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Code, Terminal, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { retryFetchJSON } from "@/components/lib/retryFetch";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
 
@@ -47,21 +48,15 @@ export function LeaderboardToggle() {
 
   const { data: codeforcesData, isLoading: isLoadingCF, error: cfError } = useQuery<CodeforcesUser[]>({
     queryKey: ["/api/codeforces-leaderboard"],
-    queryFn: async () => {
-      const res = await fetch(`${API_BASE_URL}api/codeforces-leaderboard`);
-      if (!res.ok) throw new Error("Failed to fetch Codeforces leaderboard");
-      return res.json();
-    },
+    queryFn: () => retryFetchJSON(`${API_BASE_URL}api/codeforces-leaderboard`, 3, 2000),
+
     refetchInterval: 120000, // 2 minutes
   });
 
   const { data: leetcodeData, isLoading: isLoadingLC, error: lcError } = useQuery<LeetCodeUser[]>({
     queryKey: ["/api/leetcode-leaderboard"],
-    queryFn: async () => {
-      const res = await fetch(`${API_BASE_URL}api/leetcode-leaderboard`);
-      if (!res.ok) throw new Error("Failed to fetch LeetCode leaderboard");
-      return res.json();
-    },
+    queryFn: () => retryFetchJSON(`${API_BASE_URL}api/codeforces-leaderboard`, 3, 2000),
+
     refetchInterval: 120000, // 2 minutes
   });
 
