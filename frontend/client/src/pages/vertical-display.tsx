@@ -54,14 +54,14 @@ export default function VerticalDisplay() {
   const { data: codeforcesData, isLoading: isLoadingCF, error: cfError } =
     useQuery<CodeforcesUser[]>({
       queryKey: ["/api/codeforces-leaderboard"],
-      queryFn: () => retryFetchJSON(`${API_BASE_URL}api/leetcode-leaderboard`, 3, 2000),
+      queryFn: () => retryFetchJSON(`${API_BASE_URL}api/codeforces-leaderboard`, 3, 2000),
       refetchInterval: 300000, // 5 minutes
     });
 
   const { data: leetcodeData, isLoading: isLoadingLC, error: lcError } =
     useQuery<LeetCodeUser[]>({
       queryKey: ["/api/leetcode-leaderboard"],
-      queryFn: () => retryFetchJSON(`${API_BASE_URL}api/codeforces-leaderboard`, 3, 2000),
+      queryFn: () => retryFetchJSON(`${API_BASE_URL}api/leetcode-leaderboard`, 3, 2000),
       refetchInterval: 300000, // 5 minutes
     });
 

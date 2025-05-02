@@ -56,7 +56,7 @@ export function LeaderboardToggle() {
 
   const { data: leetcodeData, isLoading: isLoadingLC, error: lcError } = useQuery<LeetCodeUser[]>({
     queryKey: ["/api/leetcode-leaderboard"],
-    queryFn: () => retryFetchJSON(`${API_BASE_URL}api/codeforces-leaderboard`, 3, 2000),
+    queryFn: () => retryFetchJSON(`${API_BASE_URL}api/leetcode-leaderboard`, 3, 2000),
 
     refetchInterval: 120000, // 2 minutes
   });
